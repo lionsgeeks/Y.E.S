@@ -9,7 +9,7 @@ const spo3 = "/assets/images/sponsors/3.jpeg";
 const spo4 = "/assets/images/sponsors/4.jpeg";
 const spo5 = "/assets/images/sponsors/5.jpeg";
 const Africa_50 = "/assets/images/sponsors/Africa_50.jpg";
-// import smala from "../../../assets/images/sponsors/happylogo.webp";
+// import smala from "/assets/images//sponsors/happylogo.webp";
 
 import TransText from "@components/TransText";
 

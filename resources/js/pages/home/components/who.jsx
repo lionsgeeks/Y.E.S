@@ -1,6 +1,6 @@
 const aboutimg = "/assets/images/heroCarousel/hero5.jpg";
 import TransText from "@components/TransText";
-// import { useAppContext } from "../../../context/AppContext";
+// 
 
 const Who = () => {
   const width = "42px";

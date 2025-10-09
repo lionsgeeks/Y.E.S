@@ -9,6 +9,9 @@ Route::get('/', function () {
 Route::get('/contact', function () {
     return Inertia::render('contact/contact');
 })->name('contact');
+Route::get('/about', function () {
+    return Inertia::render('about/index');
+})->name('about');
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
