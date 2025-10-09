@@ -1,4 +1,4 @@
-import {  TransText } from "../../components";
+import TransText from "@components/TransText";
 
 const HeroArticles = () => {
   const {  selectedLanguage } = "en";
