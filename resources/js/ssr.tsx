@@ -10,13 +10,18 @@ createServer((page) =>
         page,
         render: ReactDOMServer.renderToString,
         title: (title) => (title ? `${title} - ${appName}` : appName),
-        resolve: (name) =>
-            resolvePageComponent(
-                `./pages/${name}.tsx`,
-                import.meta.glob('./pages/**/*.tsx'),
-            ),
-        setup: ({ App, props }) => {
-            return <App {...props} />;
+
+        resolve: (name) => {
+            const jsxPages = import.meta.glob('./pages/**/*.jsx');
+            const tsxPages = import.meta.glob('./pages/**/*.tsx');
+            const pages = { ...jsxPages, ...tsxPages };
+
+            if (pages[`./pages/${name}.jsx`]) {
+                return resolvePageComponent(`./pages/${name}.jsx`, pages);
+            }
+            return resolvePageComponent(`./pages/${name}.tsx`, pages);
         },
-    }),
+
+        setup: ({ App, props }) => <App {...props} />,
+    })
 );
