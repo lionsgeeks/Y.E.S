@@ -33,7 +33,7 @@ const Hero = () => {
         fr: "Youth Empowerment Summit, Africa",
       },
       desc: {
-        en: "A substantial and focused investment in Africa's human capital...",
+        en: "A substantial and focused investment in Africa's human capital, paired with comprehensive reforms aimed at enhancing the business environment, is essential for African governments to attract increased foreign investment. This dual approach not only bolsters economic growth but also mitigates the potential for political instability that often accompanies high unemployment rates.",
         ar: "إن الاستثمار الكبير والمركّز في رأس المال البشري في أفريقيا...",
         fr: "Un investissement substantiel et ciblé dans le capital humain de l'Afrique...",
       },
@@ -46,7 +46,7 @@ const Hero = () => {
         fr: "Youth Empowerment Summit, Africa",
       },
       desc: {
-        en: "Join us at Y.E.S Africa and be part of the solution! Our initiative focuses on empowering the youth of Africa...",
+        en: "Join us at Y.E.S Africa and be part of the solution! Our initiative focuses on empowering the youth of Africa by creating opportunities for education, employment, and skills development. Together, we can turn the tide on the NEET crisis, transforming young lives and building a brighter future for the continent. Through collaboration and innovation, we aim to cultivate a new generation of leaders and change-makers, ensuring that every young person has the chance to thrive. Let’s work together to make the vision of 70 million Doers a reality!",
         ar: "انضموا إلينا في قمة تمكين الشباب في أفريقيا وكونوا جزءًا من الحل...",
         fr: "Rejoignez-nous à Y.E.S Africa et faites partie de la solution...",
       },
@@ -80,9 +80,12 @@ const Hero = () => {
               </span>
             </h1>
             <br />
-            <p className={`lg:text-lg ${selectedLanguage !== "ar" && "text-justify"}`}>
+            <p
+              className={`lg:text-lg ${selectedLanguage !== "ar" && "text-justify"} whitespace-pre-line`}
+            >
               <TransText en={s.desc.en} ar={s.desc.ar} fr={s.desc.fr} />
             </p>
+
           </div>
         </div>
       </div>
