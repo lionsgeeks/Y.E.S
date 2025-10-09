@@ -31,5 +31,21 @@ createInertiaApp({
     },
 });
 
-// Initialize light/dark mode on page load
-initializeTheme();
+// Force light mode - override system theme detection
+const forceLightMode = () => {
+    // Remove any existing dark class
+    document.documentElement.classList.remove('dark');
+    
+    // Set color scheme to light
+    document.documentElement.style.colorScheme = 'light';
+    
+    // Override any system theme detection
+    document.documentElement.style.setProperty('--background', 'oklch(1 0 0)');
+    document.documentElement.style.setProperty('--foreground', 'oklch(0.205 0 0)');
+    
+    // Set the HTML background to light
+    document.documentElement.style.backgroundColor = 'oklch(1 0 0)';
+};
+
+// Initialize with forced light mode
+forceLightMode();

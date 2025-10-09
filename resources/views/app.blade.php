@@ -1,32 +1,41 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" @class(['dark' => ($appearance ?? 'system') == 'dark'])>
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="light">
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1">
 
-        {{-- Inline script to detect system dark mode preference and apply it immediately --}}
+        {{-- Force light mode - override any system theme detection --}}
         <script>
             (function() {
-                const appearance = '{{ $appearance ?? "system" }}';
-
-                if (appearance === 'system') {
-                    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-                    if (prefersDark) {
-                        document.documentElement.classList.add('dark');
-                    }
+                // Force light mode regardless of system preference
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+                document.documentElement.style.colorScheme = 'light';
+                document.documentElement.style.backgroundColor = 'oklch(1 0 0)';
+                
+                // Prevent any dark mode detection
+                if (window.matchMedia) {
+                    window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', function() {});
                 }
             })();
         </script>
 
-        {{-- Inline style to set the HTML background color based on our theme in app.css --}}
+        {{-- Force light mode styles - disable dark mode completely --}}
         <style>
             html {
-                background-color: oklch(1 0 0);
+                background-color: oklch(1 0 0) !important;
+                color-scheme: light !important;
             }
 
+            /* Disable dark mode completely */
             html.dark {
-                background-color: oklch(0.145 0 0);
+                background-color: oklch(1 0 0) !important;
+            }
+            
+            /* Force light theme variables */
+            :root {
+                --background: oklch(1 0 0) !important;
+                --foreground: oklch(0.205 0 0) !important;
             }
         </style>
 
