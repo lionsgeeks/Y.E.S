@@ -1,10 +1,8 @@
-import React from "react";
 import { Head } from "@inertiajs/react"; // ✅ Add this for page titles
 import TransText from "@components/TransText";
 import AutoCarousel from "@components/AutoCarousel";
 
 const hero1 = "/assets/images/heroCarousel/hero1.jpg";
-const hero2 = "/assets/images/heroCarousel/hero2.jpg";
 const hero3 = "/assets/images/heroCarousel/hero3.jpg";
 const hero4 = "/assets/images/heroCarousel/hero4.jpg";
 
