@@ -17,8 +17,6 @@ const HomePage = () => {
             {/* event info: time, date, etc */}
             <EventInfo />
 
-        
-
             {/* sponsors */}
             <Sponsors />
 
