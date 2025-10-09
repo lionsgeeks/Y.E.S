@@ -21,7 +21,7 @@ export const CommitteeSection = () => {
         <>
             <section
                 dir={selectedLanguage === "ar" ? "rtl" : "ltr"}
-                className={`bg-muted-background px-8 md:px-12 lg:px-16 py-16 md:py-20 lg:py-28 flex flex-col justify-center gap-3 md:gap-4 lg:gap-6 text-black`}
+                className={`px-8 md:px-12 lg:px-16 py-16 md:py-20 lg:py-28 flex flex-col justify-center gap-3 md:gap-4 lg:gap-6 text-black`}
             >
                 <h2 className="text-xl text-alpha font-medium tracking-tighter md:text-2xl lg:text-3xl/none">
                     <TransText en="The Scientific Committee" ar="اللجنة العلمية" fr="Le Comité Scientifique" />

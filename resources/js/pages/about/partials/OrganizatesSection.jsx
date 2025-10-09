@@ -163,7 +163,7 @@ export const OrganizatesSection = () => {
                 <CommitteeSection />
 
 
-                <h2 className="text-3xl md:text-5xl lg:text-5xl/none  text-alpha font-bold tracking-tighter px-2 md:px-3 lg:px-14 py-4 md:py-5">
+                <h2 className="text-3xl md:text-5xl bg-muted-background lg:text-5xl/none  text-alpha font-bold tracking-tighter px-2 md:px-3 lg:px-14 py-7 md:py-8">
                     <TransText en="Technical Partners" ar="الشركاء التقنيون" fr="Partenaires techniques" />
                 </h2>
                 <div>
