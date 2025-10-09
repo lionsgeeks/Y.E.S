@@ -40,7 +40,13 @@
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
 
         @viteReactRefresh
-        @vite(['resources/js/app.tsx', "resources/js/pages/{$page['component']}.jsx"])
+        @viteReactRefresh
+        @vite([
+            'resources/js/app.tsx',
+            file_exists(resource_path("js/pages/{$page['component']}.tsx"))
+                ? "resources/js/pages/{$page['component']}.tsx"
+                : "resources/js/pages/{$page['component']}.jsx"
+        ])
         @inertiaHead
     </head>
     <body class="font-sans antialiased">
