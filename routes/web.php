@@ -9,6 +9,16 @@ Route::get('/', function () {
 Route::get('/contact', function () {
     return Inertia::render('contact/contact');
 })->name('contact');
+Route::get('/form', function () {
+    return Inertia::render('formulaire/formulaire');
+})->name('form');
+Route::get('/formulaire', function () {
+    return Inertia::render('formulaire/partials/form');
+})->name('formulaire');
+Route::get('/participants', function () {
+    return Inertia::render('formulaire/sponsorsForm');
+})->name('participants');
+
 
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', function () {
