@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import TransText from "../components/TransText";
+import { Link } from "@inertiajs/react";
 const yeslogo = "/assets/images/yeslogo.png";
 const jadara = "/assets/images/sponsors/Jadaralogo.png";
 
@@ -110,14 +111,14 @@ const Navbar = () => {
                       {dropdownIsOpen && (
                         <ul className="absolute left-0 w-40 mt-2 z-10 bg-white border border-gray-200 shadow-lg rounded">
                           <li>
-                            <a href="/form" className={`block px-4 py-2 ${currentPath === "/form" ? "text-beta" : "text-alpha hover:text-beta"}`}>
+                            <Link href="/form" className={`block px-4 py-2 ${currentPath === "/form" ? "text-beta" : "text-alpha hover:text-beta"}`}>
                               NGO's
-                            </a>
+                            </Link>
                           </li>
                           <li>
-                            <a target="_blank" href="https://www.registration.yesafrica.eventlink.ma/inscription/yes-africa3ZlSqN8" className={`block px-4 py-2 text-alpha hover:text-beta`}>
+                            <Link target="_blank" href="https://www.registration.yesafrica.eventlink.ma/inscription/yes-africa3ZlSqN8" className={`block px-4 py-2 text-alpha hover:text-beta`}>
                               Participants
-                            </a>
+                            </Link>
                           </li>
                         </ul>
                       )}
@@ -125,10 +126,10 @@ const Navbar = () => {
                   );
                 } else {
                   return (
-                    <li key={index}>
-                      <a href={item.path} className={`${currentPath === item.path ? "text-beta" : "text-alpha hover:text-beta"}`}>
+                    <li className="" key={index}>
+                      <Link href={item.path} className={`${currentPath === item.path ? "text-beta" : "text-alpha hover:text-beta"}`}>
                         <TransText {...item.label} />
-                      </a>
+                      </Link>
                     </li>
                   );
                 }

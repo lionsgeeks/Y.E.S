@@ -80,7 +80,7 @@ const Hero = () => {
               </span>
             </h1>
             <br />
-            <p className={`lg:text-lg ${selectedLanguage !== "ar" && "text-justify"}`}>
+            <p className={`lg:text-lg  w-1/2 ${selectedLanguage !== "ar" && "text-justify"}`}>
               <TransText en={s.desc.en} ar={s.desc.ar} fr={s.desc.fr} />
             </p>
           </div>

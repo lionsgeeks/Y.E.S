@@ -162,3 +162,49 @@
         @apply bg-background text-foreground;
     }
 }
+
+
+
+@font-face {
+  font-family: "made_tomy";
+  src: url("../../public/assets/fonts/ TOMMY\ Regular_PERSONAL\ USE.otf");
+}
+.swiper-button-next,
+.swiper-button-prev {
+  color: #2e539d;
+}
+
+body {
+  font-family: "made_tomy";
+}
+/* To Reset Tailwind Classes in a div and it's children */
+.reset-tw,
+.reset-tw * {
+  all: revert;
+}
+
+input[type="checkbox"] {
+  width: 15px;
+  height: 15px;
+  accent-color: #2e539d;
+}
+
+@keyframes ellipsis {
+  0% {
+    content: "Loading";
+  }
+  33% {
+    content: "Loading.";
+  }
+  66% {
+    content: "Loading..";
+  }
+  100% {
+    content: "Loading...";
+  }
+}
+
+.ellipsis-animation::after {
+  content: "Loading";
+  animation: ellipsis 1.5s infinite steps(1, end);
+}
