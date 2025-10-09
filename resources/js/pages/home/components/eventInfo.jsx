@@ -1,9 +1,10 @@
 
 import TransText from "@components/TransText";
 import Countdown from "@components/Countdown";
-import FacesCarousel from "@components/facesCarousel";
+import FacesCarousel from "@components/FacesCarousel";
 import { Calendar, Clock, MapPin, Download } from "lucide-react";
 import { Link } from "@inertiajs/react";
+
 const EventInfo = () => {
   const { selectedLanguage } = "en";
 
