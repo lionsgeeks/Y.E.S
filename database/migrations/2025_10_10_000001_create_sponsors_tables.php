@@ -13,11 +13,9 @@ return new class extends Migration {
             $table->string('path');
             $table->string('type')->default('sponsor');
             $table->string('website_url')->nullable();
-            $table->text('description')->nullable();
+            $table->json('description')->nullable();
             $table->timestamps();
         });
-
-
     }
 
     public function down(): void
@@ -25,5 +23,3 @@ return new class extends Migration {
         Schema::dropIfExists('sponsors');
     }
 };
-
-

@@ -17,6 +17,7 @@ class Sponsor extends Model
         'description',
         'path',
     ];
+    protected $casts = [
+        'description' => 'array',
+    ];
 }
-
-

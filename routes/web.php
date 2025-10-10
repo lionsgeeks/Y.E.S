@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\FormulaireController;
 use App\Http\Controllers\ParticipantsController;
 use App\Http\Controllers\SponsorController;
@@ -37,6 +38,7 @@ Route::post('/formulaire', [FormulaireController::class, 'store']);
 Route::post("/participants",[ParticipantsController::class,"store"]);
 
 Route::get('/sponsors', [SponsorController::class, 'index'])->name('sponsors.index');
+Route::get('/articles', [ArticleController::class, 'show']);
 
 
 

@@ -11,7 +11,7 @@ class SponsorController extends Controller
     public function index()
     {
         return response()->json(
-            Sponsor::orderBy('name')->where("type" ,"!=" , "organizer")->get()
+            Sponsor::orderBy('name')->get()
         );
     }
 
