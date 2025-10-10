@@ -2,10 +2,9 @@ import { useEffect, useState } from "react";
 import TransText from "@components/TransText";
 import CountrySelect from "./countrySelect";
 import Modal from "@components/Modal";
-import axios from "axios";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-
+import { useForm } from '@inertiajs/react';
 const Form = () => {
     const { selectedLanguage, setSelectedLanguage } = "en";
 const url = "https://management.youthempowermentsummit.africa/"
@@ -49,7 +48,7 @@ const url = "https://management.youthempowermentsummit.africa/"
         }
     }
 
-    // text 
+    // text
     const [formData, setFormData] = useState({
         name_organization: '',
         name_representative: '',
@@ -99,44 +98,142 @@ const url = "https://management.youthempowermentsummit.africa/"
         };
     }, [error]);
 
-    const handleSubmitForm = async (e) => {
-        e.preventDefault();
-        setSending(true);
-        setConfirmation(true);
-        const allData = {
-            ...formData,
-            sources_funding: selectedFunding + " " + otherFunding,
-            project_financing: selectedFinancing + " " + otherFin,
-            themes_intervention: selectedThemes + " " + otherTheme,
-            partners: selectedPartner == "no-partners" ? selectedPartner : selectedPartner + otherPartner,
-            approached_funders: selectedFunders == "no-funders" ? selectedFunders : selectedFinancing + otherFunders,
-            intervention_themes: selectedInterv + " " + otherInterv,
-            area_intervention: selectedArea,
-            country_registration: regCountry,
-            country_intervention: intCountry,
-            legal_statutes: legal,
-            internal_regulations: internal,
-            presentation: presentation,
-            project_description: proDesc,
-            funding_requirements: fund,
-            project_evaluation: projEva,
-            other_projects: otherProj,
-        }
+    // const handleSubmitForm = async (e) => {
+    //     e.preventDefault();
+    //     setSending(true);
+    //     setConfirmation(true);
+    //     const allData = {
+    //         ...formData,
+    //         sources_funding: selectedFunding + " " + otherFunding,
+    //         project_financing: selectedFinancing + " " + otherFin,
+    //         themes_intervention: selectedThemes + " " + otherTheme,
+    //         partners: selectedPartner == "no-partners" ? selectedPartner : selectedPartner + otherPartner,
+    //         approached_funders: selectedFunders == "no-funders" ? selectedFunders : selectedFinancing + otherFunders,
+    //         intervention_themes: selectedInterv + " " + otherInterv,
+    //         area_intervention: selectedArea,
+    //         country_registration: regCountry,
+    //         country_intervention: intCountry,
+    //         legal_statutes: legal,
+    //         internal_regulations: internal,
+    //         presentation: presentation,
+    //         project_description: proDesc,
+    //         funding_requirements: fund,
+    //         project_evaluation: projEva,
+    //         other_projects: otherProj,
+    //     }
 
-        const newForm = new FormData();
-        Object.keys(allData).forEach(key => {
-            newForm.append(key, allData[key]);
-        });
+    //     const newForm = new FormData();
+    //     Object.keys(allData).forEach(key => {
+    //         newForm.append(key, allData[key]);
+    //     });
 
-        axios.post(url + '/api/formulaire', newForm).then((res) => {
-            // the form text inputs
-            setFormData(prevFormData => 
-                Object.keys(prevFormData).reduce((acc, key) => {
-                    acc[key] = '';
-                    return acc;
-                }, {})
-            );
-            // selects and their other
+    //     axios.post(url + '/api/formulaire', newForm).then((res) => {
+    //         // the form text inputs
+    //         setFormData(prevFormData =>
+    //             Object.keys(prevFormData).reduce((acc, key) => {
+    //                 acc[key] = '';
+    //                 return acc;
+    //             }, {})
+    //         );
+    //         // selects and their other
+    //         setSelectedPartner('');
+    //         setOtherPartner('');
+    //         setSelectedFunders('');
+    //         setOtherFunders('');
+    //         setSelectedFinancing('');
+    //         setOtherFin('');
+    //         setSelectedArea('');
+    //         setRegCountry('');
+    //         setIntCountry('');
+
+    //         // files
+    //         setLegal();
+    //         setInternal();
+    //         setPresentation();
+    //         setProDesc();
+    //         setFund();
+    //         setOtherProj();
+    //         setProjEva();
+
+    //         // checkboxes
+    //         setConform(false);
+    //         setAccepting(false);
+    //         setSelectedThemes([]);
+    //         setOtherTheme('');
+    //         setSelectedInterv([]);
+    //         setOtherInterv('');
+    //         setSelectedFunding('');
+    //         setOtherFunding('');
+
+    //         // reset the tab
+    //         setCurrentTab('General Information');
+
+    //         setSending(false);
+    //         setConfirmation(true);
+    //         if (res.status === 200) {
+    //             setValidate(true);
+    //         } else {
+    //             setValidate(false);
+    //         }
+    //     }).catch((err) => {
+    //         console.log('form error', err);
+    //         setError(err);
+    //     })
+    // }
+
+
+
+    const { data, setData, post, reset, processing, errors, transform } = useForm({
+    ...formData,
+    sources_funding: '',
+    project_financing: '',
+    themes_intervention: '',
+    partners: '',
+    approached_funders: '',
+    intervention_themes: '',
+    area_intervention: '',
+    country_registration: '',
+    country_intervention: '',
+    legal_statutes: null,
+    internal_regulations: null,
+    presentation: null,
+    project_description: null,
+    funding_requirements: null,
+    project_evaluation: null,
+    other_projects: null,
+});
+
+const handleSubmitForm = (e) => {
+    e.preventDefault();
+    setSending(true);
+
+    const allData = {
+        ...formData,
+        sources_funding: selectedFunding + " " + otherFunding,
+        project_financing: selectedFinancing + " " + otherFin,
+        themes_intervention: selectedThemes + " " + otherTheme,
+        partners: selectedPartner == "no-partners" ? selectedPartner : selectedPartner + otherPartner,
+        approached_funders: selectedFunders == "no-funders" ? selectedFunders : selectedFinancing + otherFunders,
+        intervention_themes: selectedInterv + " " + otherInterv,
+        area_intervention: selectedArea,
+        country_registration: regCountry,
+        country_intervention: intCountry,
+        legal_statutes: legal,
+        internal_regulations: internal,
+        presentation: presentation,
+        project_description: proDesc,
+        funding_requirements: fund,
+        project_evaluation: projEva,
+        other_projects: otherProj,
+    };
+
+    // Submit using transform to avoid async setData race
+    transform(() => allData);
+    post('/formulaire', {
+        forceFormData: true, // required for file uploads
+        onStart: () => setConfirmation(true),
+        onSuccess: () => {
+            reset();
             setSelectedPartner('');
             setOtherPartner('');
             setSelectedFunders('');
@@ -147,16 +244,14 @@ const url = "https://management.youthempowermentsummit.africa/"
             setRegCountry('');
             setIntCountry('');
 
-            // files
-            setLegal();
-            setInternal();
-            setPresentation();
-            setProDesc();
-            setFund();
-            setOtherProj();
-            setProjEva();
+            setLegal(null);
+            setInternal(null);
+            setPresentation(null);
+            setProDesc(null);
+            setFund(null);
+            setOtherProj(null);
+            setProjEva(null);
 
-            // checkboxes
             setConform(false);
             setAccepting(false);
             setSelectedThemes([]);
@@ -166,21 +261,18 @@ const url = "https://management.youthempowermentsummit.africa/"
             setSelectedFunding('');
             setOtherFunding('');
 
-            // reset the tab
             setCurrentTab('General Information');
-
             setSending(false);
-            setConfirmation(true);
-            if (res.status === 200) {
-                setValidate(true);
-            } else {
-                setValidate(false);
-            }
-        }).catch((err) => {
+            setValidate(true);
+        },
+        onError: (err) => {
             console.log('form error', err);
             setError(err);
-        })
-    }
+            setSending(false);
+            setValidate(false);
+        }
+    });
+};
 
     const [currentTab, setCurrentTab] = useState('General Information');
     const formLanguages = [
@@ -518,7 +610,7 @@ const url = "https://management.youthempowermentsummit.africa/"
         <>
         <Navbar />
         <section className="p-4" >
-            {true ? 
+            {true ?
                     <div>
                         <div className="flex gap-3 items-center p-3 bg-gray-300">
                             {formLanguages.map(({ language, code }, index) => (
