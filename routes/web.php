@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\FormulaireController;
 use App\Http\Controllers\ParticipantsController;
+use App\Http\Controllers\SponsorController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -31,6 +32,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 Route::post('/formulaire', [FormulaireController::class, 'store']);
 Route::post("/participants",[ParticipantsController::class,"store"]);
+
+Route::get('/sponsors', [SponsorController::class, 'index'])->name('sponsors.index');
+
 
 
 require __DIR__.'/settings.php';
