@@ -85,7 +85,7 @@ class FormulaireController extends Controller
         ]);
 
         Mail::to($request->email_representative)->send(new FormApproved($request->name_organization,));
-          return redirect(route("home"));
+          return back();
     }
 
     /**

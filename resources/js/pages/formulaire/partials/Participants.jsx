@@ -1,19 +1,18 @@
 import React, { useState } from 'react';
 import TransText from "@components/TransText";
 // import { useAppContext } from '../../../context/AppContext';
-import axios from 'axios';
 import CountrySelect from './countrySelect';
 import { useEffect } from 'react';
 import Modal from '@components/Modal';
+import { useForm } from '@inertiajs/react';
 
 const Participants = () => {
 
     const { selectedLanguage, setSelectedLanguage } = "en";
-    const url = "https://management.youthempowermentsummit.africa/"
 
     // ? POST FUNC
 
-    const [data, setData] = useState({
+    const { data, setData, post, processing, reset } = useForm({
         civility: "",
         name: "",
         organisation: "",
@@ -22,14 +21,13 @@ const Participants = () => {
         mail: "",
         phone: "",
         country: "",
-    })
-
-    const [logo, setLogo] = useState();
+        otherCount: "",
+        logo: null,
+    });
 
     // console.log(data);
 
 
-    const [otherCount, setOtherCount] = useState("");
     const [isOtherChoosed, setIsOtherChoosed] = useState(false)
 
     useEffect(() => {
@@ -40,25 +38,28 @@ const Participants = () => {
         }
     }, [data.country])
 
-    let isFormFull = Object.keys(data).every((e) => data[e].trim() !== "") && (data.country == "other" ? otherCount.trim() : true) && logo
+    let isFormFull = [
+        data.civility,
+        data.name,
+        data.organisation,
+        data.category,
+        data.position,
+        data.mail,
+        data.phone,
+        data.country,
+    ].every((v) => String(v ?? "").trim() !== "") && (data.country == "other" ? String(data.otherCount ?? "").trim() : true) && !!data.logo
     // const [isFormFull,setIsFormFull] = useState(Object.keys(data).every((e)=>data[e].trim() !== ""))
 
     // console.log(isFormFull);
-
-    const [isLoading, setIsLoading] = useState(false)
 
     const [isSentSuc, setIsSentSuc] = useState(false);
 
     const HandleChange = (e) => {
         const value = e.target.value;
-
-        setData({
-            ...data,
-            [e.target.name]: value
-        })
+        setData(e.target.name, value);
     }
 
-    const handleFileChange = (e, setter) => {
+    const handleFileChange = (e, field) => {
         const MAX_SIZE = 10 * 1024 * 1024;
         const selectedFile = e.target.files[0];
 
@@ -66,57 +67,24 @@ const Participants = () => {
             if (selectedFile.size > MAX_SIZE) {
                 alert('File is too large. Max size is 10MB.');
             } else {
-                setter(selectedFile);
+                setData(field, selectedFile);
             }
         }
     }
 
-    const HandleSubmit = async (e) => {
-        if (isLoading) return
-
-        setIsLoading(true)
-
+    const HandleSubmit = (e) => {
+        if (processing) return;
         e.preventDefault();
-
-        const formData = new FormData();
-
-        // Append non-file fields
-        formData.append('civility', data.civility);
-        formData.append('name', data.name);
-        formData.append('organisation', data.organisation);
-        formData.append('category', data.category);
-        formData.append('position', data.position);
-        formData.append('mail', data.mail);
-        formData.append('phone', data.phone);
-        formData.append('country', data.country);
-        formData.append('otherCount', otherCount);
-        formData.append('logo', logo);
-
-
-
-        try {
-            const response = await axios.post(url + "/api/participants", formData)
-            console.log(response);
-            if (response.status == 200) {
-                setIsSentSuc(true)
+        post('/participants', {
+            forceFormData: true,
+            onSuccess: () => {
+                setIsSentSuc(true);
+                reset();
+            },
+            onError: () => {
+                // Keep inputs for user correction
             }
-        } catch (error) {
-            console.error("Error:", error);
-        } finally {
-            // setData({
-            //     civility: "",
-            //     name: "",
-            //     organisation: "",
-            //     category: "",
-            //     position: "",
-            //     mail: "",
-            //     phone: "",
-            //     country: "",
-            // })
-            // setIsLoading(false)
-            // setOtherCount("")
-            // setLogo('')
-        }
+        });
     }
     const closeBtn = () => {
         return <>
@@ -196,7 +164,7 @@ const Participants = () => {
                             <div className="relative">
                                 <p>Photo: <span className='text-red-700 '>*</span></p>
                                 <input
-                                    onChange={(e) => { handleFileChange(e, setLogo) }}
+                                    onChange={(e) => { handleFileChange(e, 'logo') }}
                                     className="absolute inset-0 opacity-0 cursor-pointer"
                                     type="file"
                                     accept="image/jpeg, image/png, image/gif, image/webp, image/svg+xml"
@@ -207,7 +175,7 @@ const Participants = () => {
                                 />
                                 <label
                                     htmlFor="logo"
-                                    className={`flex items-center gap-3 cursor-pointer border border-alpha/20 rounded p-2 ${logo ? 'bg-alpha text-white' : ''}`}
+                                    className={`flex items-center gap-3 cursor-pointer border border-alpha/20 rounded p-2 ${data.logo ? 'bg-alpha text-white' : ''}`}
                                 >
                                     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6">
                                         <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 15.75 5.159-5.159a2.25 2.25 0 0 1 3.182 0l5.159 5.159m-1.5-1.5 1.409-1.409a2.25 2.25 0 0 1 3.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 0 0 1.5-1.5V6a1.5 1.5 0 0 0-1.5-1.5H3.75A1.5 1.5 0 0 0 2.25 6v12a1.5 1.5 0 0 0 1.5 1.5Zm10.5-11.25h.008v.008h-.008V8.25Zm.375 0a.375.375 0 1 1-.75 0 .375.375 0 0 1 .75 0Z" />
@@ -251,14 +219,14 @@ const Participants = () => {
                             {
                                 data.country == "other" &&
                                 <>
-                                    <input required value={otherCount} onChange={(e) => { setOtherCount(e.target.value) }}
+                                    <input required value={data.otherCount} onChange={(e) => { setData('otherCount', e.target.value) }}
                                         placeholder={selectedLanguage === "ar" ? "أخرى" : selectedLanguage === "fr" ? "Autre" : selectedLanguage === "en" ? "Other" : selectedLanguage === "pr" ? "Outro" : selectedLanguage === "sw" ? "Nyingine" : ""}
                                         className={` ${isOtherChoosed ? "flex" : "hidden"} border-[1.4px] px-2 py-1 rounded-[5px] `}
                                         type="text" name="other" id="otherCount" />
                                 </>
                             }
                         </div>
-                        <button type='submit' className={` ${isFormFull ? "bg-alpha" : "bg-gray-500 cursor-not-allowed"} py-3 ${isLoading && "bg-gray-300 cursor-progress"} text-white rounded-[5px]`} disabled={isLoading} ><TransText ar={isLoading ? "جارٍ التحميل" : "إرسال"} fr={isLoading ? "Chargement" : "Soumettre"} en={isLoading ? "Loading" : "Submit"} pr={isLoading ? "Carregando" : "Enviar"} sw={isLoading ? "Inapakia" : "Tuma"} /></button>
+                        <button type='submit' className={` ${isFormFull ? "bg-alpha" : "bg-gray-500 cursor-not-allowed"} py-3 ${processing && "bg-gray-300 cursor-progress"} text-white rounded-[5px]`} disabled={processing} ><TransText ar={processing ? "جارٍ التحميل" : "إرسال"} fr={processing ? "Chargement" : "Soumettre"} en={processing ? "Loading" : "Submit"} pr={processing ? "Carregando" : "Enviar"} sw={processing ? "Inapakia" : "Tuma"} /></button>
                     </form>
                 </div>
 

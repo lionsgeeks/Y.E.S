@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\FormulaireController;
+use App\Http\Controllers\ParticipantsController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -29,6 +30,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
 
 Route::post('/formulaire', [FormulaireController::class, 'store']);
+Route::post("/participants",[ParticipantsController::class,"store"]);
 
 
 require __DIR__.'/settings.php';
