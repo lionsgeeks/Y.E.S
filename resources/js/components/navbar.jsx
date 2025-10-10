@@ -116,7 +116,7 @@ const Navbar = () => {
                             </Link>
                           </li>
                           <li>
-                            <Link target="_blank" href="https://www.registration.yesafrica.eventlink.ma/inscription/yes-africa3ZlSqN8" className={`block px-4 py-2 text-alpha hover:text-beta`}>
+                            <Link target="_blank" href="/participants" className={`block px-4 py-2 text-alpha hover:text-beta`}>
                               Participants
                             </Link>
                           </li>
