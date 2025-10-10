@@ -18,7 +18,7 @@ createInertiaApp({
         if (pages[`./pages/${name}.jsx`]) {
             return resolvePageComponent(`./pages/${name}.jsx`, pages);
         }
-        return resolvePageComponent(`./pages/${name}.tsx`, pages);
+        return resolvePageComponent(`./pages/${name}.jsx`, pages);
     },
 
     setup({ el, App, props }) {
