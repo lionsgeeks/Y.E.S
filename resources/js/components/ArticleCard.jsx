@@ -95,7 +95,7 @@ const ArticleCard = ({ index, id, image, title, description, created_at }) => {
 
         {/* ✅ Read more button using Inertia link */}
         <Link
-          href={route("articles.show", id)} // ✅ Laravel route name (e.g., Route::get('/articles/{id}', ...)->name('articles.show'))
+          href="" // ✅ Laravel route name (e.g., Route::get('/articles/{id}', ...)->name('articles.show'))
           className={selectedLanguage === "ar" ? "self-end" : ""}
         >
           <button

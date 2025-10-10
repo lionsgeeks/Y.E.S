@@ -9,10 +9,10 @@ const HeroArticles = () => {
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const res = await fetch("/articles"); 
+        const res = await fetch("/articless");
         if (!res.ok) throw new Error("Failed to fetch articles");
         const data = await res.json();
-        setArticles(data);
+        setArticles(data.data);
       } catch (err) {
         console.error(err);
       }
@@ -20,6 +20,7 @@ const HeroArticles = () => {
 
     fetchArticles();
   }, []);
+console.log(articles);
 
   if (articles.length === 0) {
     return null;
@@ -42,7 +43,7 @@ const HeroArticles = () => {
       <br />
 
       <div className="flex items-center justify-around flex-col lg:flex-row gap-7">
-        {articles.map((blog, index) => (
+        {articles.slice(0,3).map((blog, index) => (
           <ArticleCard key={index} index={index} {...blog} />
         ))}
       </div>

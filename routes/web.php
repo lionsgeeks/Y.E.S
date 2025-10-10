@@ -38,9 +38,12 @@ Route::post('/formulaire', [FormulaireController::class, 'store']);
 Route::post("/participants",[ParticipantsController::class,"store"]);
 
 Route::get('/sponsors', [SponsorController::class, 'index'])->name('sponsors.index');
-Route::get('/articles', [ArticleController::class, 'show']);
+Route::get('/articless', [ArticleController::class, 'show']);
 
 
+Route::get('/articles', function () {
+    return Inertia::render('articles/arcticles');
+})->name('acticles');
 
 require __DIR__.'/settings.php';
 require __DIR__.'/auth.php';
