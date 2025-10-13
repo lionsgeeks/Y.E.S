@@ -4,8 +4,8 @@ import HeroArticles from "./components/heroArticles";
 import MobileApp from "./components/mobileApp";
 import Sponsors from "./components/sponsors";
 import Who from "./components/who";
-import Navbar from "../../components/navbar";
-import Footer from "../../components/footer";
+import Navbar from "@components/navbar";
+import Footer from "@components/footer";
 const HomePage = () => {
 
     return (

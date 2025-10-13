@@ -26,6 +26,9 @@ Route::get('/formulaire', function () {
 Route::get('/participants', function () {
     return Inertia::render('formulaire/sponsorsForm');
 })->name('participants');
+Route::get('/maps', function () {
+    return Inertia::render('maps/maps');
+})->name('maps');
 
 
 Route::middleware(['auth', 'verified'])->group(function () {
