@@ -17,7 +17,7 @@ Route::get('/', function () {
     if (Schema::hasTable('sponsors')) {
         $sponsors = Sponsor::where('type', '!=', 'organizer')->get();
     }
-    return Inertia::render('home/home', [
+    return Inertia::render('client/home/home', [
         'sponsors' => $sponsors
     ]);
 })->name('home');

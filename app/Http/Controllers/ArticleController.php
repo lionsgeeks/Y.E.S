@@ -16,7 +16,7 @@ class ArticleController extends Controller
     public function index()
     {
         $articles = Article::all();
-        return Inertia::render('client/articles/index', [
+        return Inertia::render('admin/articles/index' , [
             'articles' => $articles
         ]);
     }
@@ -24,6 +24,10 @@ class ArticleController extends Controller
     /**
      * Store a newly created resource in storage.
      */
+    public function create()
+    {
+        return Inertia::render('admin/articles/partials/CreateArticle');
+    }
     public function store(Request $request)
     {
         //
@@ -32,20 +36,21 @@ class ArticleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($id)
+    public function show()
     {
-        $article = Article::find($id);
-        $articles = Article::all();
-
-        return Inertia::render('client/articles/[id]', [
-            'article' => $article,
-            'articles' => $articles,
-        ]);
+        
     }
 
     /**
      * Update the specified resource in storage.
      */
+    public function edit($id)
+    {
+        $article = Article::find($id);
+        return Inertia::render('admin/articles/partials/EditArticle' , [
+            'article' => $article
+        ]);
+    }
     public function update(Request $request, string $id)
     {
         //
