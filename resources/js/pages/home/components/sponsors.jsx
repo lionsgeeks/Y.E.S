@@ -12,9 +12,8 @@ const Africa_50 = "/assets/images/sponsors/Africa_50.jpg";
 // import smala from "/assets/images//sponsors/happylogo.webp";
 
 import TransText from "@components/TransText";
-import { useEffect, useState } from "react";
 
-const Sponsors = () => {
+const Sponsors = ({ sponsors = [] }) => {
     const title = {
         en: "They said yes to africa",
         ar: "قالوا نعم لأفريقيا",
@@ -22,24 +21,18 @@ const Sponsors = () => {
     };
     const { selectedLanguage } = "en";
 
-    const [sponsors, setSponsors] = useState([]);
-
-    useEffect(() => {
-        fetch("/sponsors")
-            .then((res) => res.json())
-            .then((data) => {
-                const flat = (data || [])
-                    .filter((s) => s.type !== "organizer") 
-                    .map((s) => ({ src: `/${s.path}`, url: s.website_url || "#" }))
-                    .filter((x) => x.src !== "/null");
-                setSponsors(flat);
-            })
-            .catch(() => setSponsors([]));
-    }, []);
+    // Process sponsors data to filter and format for display
+    const processedSponsors = sponsors
+        .filter((s) => s.type !== "organizer") 
+        .map((s) => ({ 
+            src: s.path ? `/assets/images/sponsors/${s.path}` : null, 
+            url: s.website_url || "#" 
+        }))
+        .filter((x) => x.src !== null);
 
 
     // Duplicate sponsors once only (for smooth infinite scroll)
-    const duplicatedSponsors = [...sponsors, ...sponsors];
+    const duplicatedSponsors = [...processedSponsors, ...processedSponsors];
 
     return (
         <section className="px-8 md:px-12 lg:px-10 pt-8 md:pt-10 lg:pt-14 pb-16 md:pb-20 lg:pb-28">
@@ -68,7 +61,7 @@ const Sponsors = () => {
                         (e.currentTarget.style.animationPlayState = "running")
                     }
                 >
-                    {sponsors.map((sponsor, idx) => (
+                    {processedSponsors.map((sponsor, idx) => (
                         <a
                             key={`s-${idx}`}
                             href={sponsor.url}
