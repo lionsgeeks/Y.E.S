@@ -8,6 +8,7 @@ import Navbar from "@components/navbar";
 import Footer from "@components/footer";
 const HomePage = () => {
 
+const HomePage = ({ sponsors = [] }) => {
     return (
         <>
             <Navbar />
@@ -18,7 +19,7 @@ const HomePage = () => {
             <EventInfo />
 
             {/* sponsors */}
-            <Sponsors />
+            <Sponsors sponsors={sponsors} />
 
             {/* who we are */}
             <Who />

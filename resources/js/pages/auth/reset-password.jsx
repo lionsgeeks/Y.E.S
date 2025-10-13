@@ -8,12 +8,9 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
 
-interface ResetPasswordProps {
-    token: string;
-    email: string;
-}
 
-export default function ResetPassword({ token, email }: ResetPasswordProps) {
+
+export default function ResetPassword({ token, email }) {
     return (
         <AuthLayout
             title="Reset password"
