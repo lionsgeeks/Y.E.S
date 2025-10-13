@@ -7,11 +7,16 @@ use App\Http\Controllers\SponsorController;
 use App\Http\Controllers\ScientificCommitteeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\MesageController;
+use App\Models\Sponsor;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $sponsors = \App\Models\Sponsor::where('type', '!=', 'organizer')->get();
+    $sponsors = [];
+    if (Schema::hasTable('sponsors')) {
+        $sponsors = Sponsor::where('type', '!=', 'organizer')->get();
+    }
     return Inertia::render('home/home', [
         'sponsors' => $sponsors
     ]);
