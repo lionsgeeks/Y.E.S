@@ -1,17 +1,4 @@
-type Item = {
-    id: string | number
-    name: string
-    lat?: number
-    lng?: number
-}
-
-type Props = {
-    items: Item[]
-    onSelect?: (item: Item) => void
-    onSearch?: (query: string) => void
-}
-
-export default function MarkerList({ items, onSelect, onSearch }: Props) {
+export default function MarkerList({ items, onSelect, onSearch }) {
     return (
         <div className="space-y-2">
             <input
@@ -32,6 +19,5 @@ export default function MarkerList({ items, onSelect, onSearch }: Props) {
         </div>
     )
 }
-
 
 

@@ -2,30 +2,13 @@ import { useEffect, useRef } from 'react'
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css'
 
-type MarkerData = {
-    id: string | number
-    lat: number
-    lng: number
-    iconUrl?: string
-}
-
-type Props = {
-    accessToken: string
-    styleUrl: string
-    center?: [number, number]
-    zoom?: number
-    markers?: MarkerData[]
-    onMapReady?: (map: mapboxgl.Map) => void
-    onClick?: (lngLat: { lng: number; lat: number }) => void
-}
-
-export default function MapView({ accessToken, styleUrl, center = [0, 0], zoom = 2, markers = [], onMapReady, onClick }: Props) {
-    const mapRef = useRef<mapboxgl.Map | null>(null)
-    const containerRef = useRef<HTMLDivElement | null>(null)
-    const markerRefs = useRef<mapboxgl.Marker[]>([])
+export default function MapView({ accessToken, styleUrl, center = [0, 0], zoom = 2, markers = [], onMapReady, onClick }) {
+    const mapRef = useRef(null)
+    const containerRef = useRef(null)
+    const markerRefs = useRef([])
     // keep latest callbacks without re-creating the map
-    const clickCbRef = useRef<typeof onClick | undefined>(onClick)
-    const readyCbRef = useRef<typeof onMapReady | undefined>(onMapReady)
+    const clickCbRef = useRef(onClick)
+    const readyCbRef = useRef(onMapReady)
 
     useEffect(() => { clickCbRef.current = onClick }, [onClick])
     useEffect(() => { readyCbRef.current = onMapReady }, [onMapReady])
@@ -70,7 +53,7 @@ export default function MapView({ accessToken, styleUrl, center = [0, 0], zoom =
             }
             const marker = new mapboxgl.Marker(m.iconUrl ? el : undefined)
                 .setLngLat([m.lng, m.lat])
-                .addTo(mapRef.current!)
+                .addTo(mapRef.current)
             markerRefs.current.push(marker)
         })
     }, [markers])

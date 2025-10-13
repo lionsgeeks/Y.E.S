@@ -4,25 +4,16 @@ import MapView from '@/components/MapView'
 import MarkerList from '@/components/MarkerList'
 import { useEffect, useMemo, useState } from 'react'
 
-type ApiMarker = {
-    id: string | number
-    lat: number
-    lng: number
-    name: string
-    logo?: string
-}
-
 export default function MapsIndex() {
-    const [markers, setMarkers] = useState<ApiMarker[]>([])
+    const [markers, setMarkers] = useState([])
     const [query, setQuery] = useState('')
 
     useEffect(() => {
-        // minimal fetch to existing endpoint used in legacy page
         fetch('https://management.youthempowermentsummit.africa/api/approved', { method: 'POST' })
             .then((r) => r.json())
             .then((data) => {
-                const flat = Object.values(data).flat() as any[]
-                const mks: ApiMarker[] = flat
+                const flat = Object.values(data).flat()
+                const mks = flat
                     .filter((e) => e?.showable?.lat && e?.showable?.lng)
                     .map((e) => ({
                         id: `${e.showable_type}-${e.showable.id}`,
