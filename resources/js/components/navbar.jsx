@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import TransText from "../components/TransText";
 import { Link } from "@inertiajs/react";
 const yeslogo = "/assets/images/yeslogo.png";
-const jadara = "/assets/images/sponsors/Jadaralogo.png";
+// const jadara = "/assets/images/sponsors/Jadaralogo.png";
 
 const Navbar = () => {
   const [isToggle, setIsToggle] = useState(false);
@@ -55,10 +55,10 @@ const Navbar = () => {
       image: yeslogo,
       link: "/",
     },
-    {
-      image: jadara,
-      link: "https://jadara.ngo/",
-    },
+    // {
+    //   image: jadara,
+    //   link: "https://jadara.ngo/",
+    // },
   ];
 
   return (

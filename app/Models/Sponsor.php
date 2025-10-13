@@ -12,7 +12,7 @@ class Sponsor extends Model
 
     protected $fillable = [
         'name',
-        'type', // organizer | sponsor | technical_partner
+        'type', 
         'website_url',
         'description',
         'path',

@@ -8,12 +8,16 @@ use App\Http\Controllers\ScientificCommitteeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\MesageController;
 use App\Models\Sponsor;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
 Route::get('/', function () {
-    $sponsors = \App\Models\Sponsor::where('type', '!=', 'organizer')->get();
-    return Inertia::render('client/home/home', [
+    $sponsors = [];
+    if (Schema::hasTable('sponsors')) {
+        $sponsors = Sponsor::where('type', '!=', 'organizer')->get();
+    }
+    return Inertia::render('home/home', [
         'sponsors' => $sponsors
     ]);
 })->name('home');
@@ -22,7 +26,7 @@ Route::get('/contact', function () {
 })->name('contact');
 Route::get('/about', function () {
     $sponsors = Sponsor::all();
-    return Inertia::render('client/about/index',[
+    return Inertia::render('client/about/index', [
         'sponsors' => $sponsors
     ]);
 })->name('about');
@@ -35,6 +39,9 @@ Route::get('/formulaire', function () {
 Route::get('/participants', function () {
     return Inertia::render('client/formulaire/sponsorsForm');
 })->name('participants');
+Route::get('/maps', function () {
+    return Inertia::render('maps/maps');
+})->name('maps');
 
 
 
