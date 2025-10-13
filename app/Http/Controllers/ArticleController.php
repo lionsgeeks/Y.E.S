@@ -16,7 +16,7 @@ class ArticleController extends Controller
     public function index()
     {
         $articles = Article::all();
-        return Inertia::render('articles/index', [
+        return Inertia::render('client/articles/index', [
             'articles' => $articles
         ]);
     }
@@ -37,7 +37,7 @@ class ArticleController extends Controller
         $article = Article::find($id);
         $articles = Article::all();
 
-        return Inertia::render('articles/[id]', [
+        return Inertia::render('client/articles/[id]', [
             'article' => $article,
             'articles' => $articles,
         ]);
