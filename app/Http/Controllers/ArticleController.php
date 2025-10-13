@@ -16,7 +16,7 @@ class ArticleController extends Controller
     public function index()
     {
         $articles = Article::all();
-        return Inertia::render('admin/articles/index' , [
+        return Inertia::render('admin/articles/index', [
             'articles' => $articles
         ]);
     }
@@ -36,10 +36,7 @@ class ArticleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show()
-    {
-        
-    }
+    public function show() {}
 
     /**
      * Update the specified resource in storage.
@@ -47,7 +44,7 @@ class ArticleController extends Controller
     public function edit($id)
     {
         $article = Article::find($id);
-        return Inertia::render('admin/articles/partials/EditArticle' , [
+        return Inertia::render('admin/articles/partials/EditArticle', [
             'article' => $article
         ]);
     }
@@ -59,8 +56,10 @@ class ArticleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $article = Article::find($id);
+        $article->delete();
+        return redirect()->back()->with('success', 'Deleted article successfully');
     }
 }

@@ -9,6 +9,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
     Route::get('/articles', [ArticleController::class, 'index'])->name('admin.articles');
     Route::get('/article/create', [ArticleController::class, 'create'])->name('admin.articles.create');
     Route::get('/article/edit/{id}', [ArticleController::class, 'edit'])->name('admin.articles.edit');
+    Route::delete('/article/destroy/{id}', [ArticleController::class, 'destroy'])->name('admin.articles.destroy');
 });
 
 Route::get('/articles', function () {
