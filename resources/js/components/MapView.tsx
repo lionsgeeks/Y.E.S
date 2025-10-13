@@ -23,6 +23,12 @@ export default function MapView({ accessToken, styleUrl, center = [0, 0], zoom =
     const mapRef = useRef<mapboxgl.Map | null>(null)
     const containerRef = useRef<HTMLDivElement | null>(null)
     const markerRefs = useRef<mapboxgl.Marker[]>([])
+    // keep latest callbacks without re-creating the map
+    const clickCbRef = useRef<typeof onClick | undefined>(onClick)
+    const readyCbRef = useRef<typeof onMapReady | undefined>(onMapReady)
+
+    useEffect(() => { clickCbRef.current = onClick }, [onClick])
+    useEffect(() => { readyCbRef.current = onMapReady }, [onMapReady])
 
     useEffect(() => {
         mapboxgl.accessToken = accessToken
@@ -35,8 +41,8 @@ export default function MapView({ accessToken, styleUrl, center = [0, 0], zoom =
         })
         mapRef.current = map
 
-        map.on('click', (e) => onClick?.(e.lngLat))
-        onMapReady?.(map)
+        map.on('click', (e) => clickCbRef.current?.(e.lngLat))
+        readyCbRef.current?.(map)
 
         return () => {
             markerRefs.current.forEach((m) => m.remove())
@@ -44,7 +50,7 @@ export default function MapView({ accessToken, styleUrl, center = [0, 0], zoom =
             map.remove()
             mapRef.current = null
         }
-    }, [])
+    }, [accessToken, styleUrl, center[0], center[1], zoom])
 
     useEffect(() => {
         if (!mapRef.current) return
