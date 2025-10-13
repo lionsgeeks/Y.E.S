@@ -7,6 +7,7 @@ use App\Http\Controllers\SponsorController;
 use App\Http\Controllers\ScientificCommitteeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\MesageController;
+use App\Models\Sponsor;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -20,7 +21,10 @@ Route::get('/contact', function () {
     return Inertia::render('contact/contact');
 })->name('contact');
 Route::get('/about', function () {
-    return Inertia::render('about/index');
+    $sponsors = Sponsor::all();
+    return Inertia::render('about/index',[
+        'sponsors' => $sponsors
+    ]);
 })->name('about');
 Route::get('/form', function () {
     return Inertia::render('formulaire/formulaire');
@@ -66,13 +70,10 @@ Route::post('/formulaire', [FormulaireController::class, 'store']);
 Route::post("/participants", [ParticipantsController::class, "store"]);
 
 Route::get('/sponsors', [SponsorController::class, 'index'])->name('sponsors.index');
-Route::get('/articless', [ArticleController::class, 'show']);
 
 
-Route::get('/articles', function () {
-    return Inertia::render('articles/arcticles');
-})->name('acticles');
 Route::post('/messages', [MesageController::class, 'store']);
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
+require __DIR__ . '/articles.php';

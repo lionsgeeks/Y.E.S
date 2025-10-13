@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ArticleController extends Controller
 {
@@ -14,7 +15,10 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        //
+        $articles = Article::all();
+        return Inertia::render('articles/index', [
+            'articles' => $articles
+        ]);
     }
 
     /**
@@ -28,9 +32,15 @@ class ArticleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show()
+    public function show($id)
     {
-        return ArticleResource::collection(Article::orderBy('created_at', 'desc')->get());
+        $article = Article::find($id);
+        $articles = Article::all();
+
+        return Inertia::render('articles/[id]', [
+            'article' => $article,
+            'articles' => $articles,
+        ]);
     }
 
     /**
