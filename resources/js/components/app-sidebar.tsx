@@ -1,6 +1,4 @@
-import { NavFooter } from '@/components/nav-footer';
 import { NavMain } from '@/components/nav-main';
-import { NavUser } from '@/components/nav-user';
 import {
     Sidebar,
     SidebarContent,
@@ -13,8 +11,7 @@ import {
 import { dashboard } from '@/routes';
 import { type NavItem } from '@/types';
 import { Link } from '@inertiajs/react';
-import { BookOpen, Folder, LayoutGrid, Building2, Users, UserCheck, Clipboard } from 'lucide-react';
-import AppLogo from './app-logo';
+import { LayoutGrid, Building2, Users, UserCheck, Clipboard } from 'lucide-react';
 
 const mainNavItems: NavItem[] = [
     {
@@ -44,28 +41,21 @@ const mainNavItems: NavItem[] = [
     },
 ];
 
-const footerNavItems: NavItem[] = [
-    {
-        title: 'Repository',
-        href: 'https://github.com/laravel/react-starter-kit',
-        icon: Folder,
-    },
-    {
-        title: 'Documentation',
-        href: 'https://laravel.com/docs/starter-kits#react',
-        icon: BookOpen,
-    },
-];
+// Footer links to external repos/docs removed per design
 
 export function AppSidebar() {
     return (
         <Sidebar collapsible="icon" variant="inset">
-            <SidebarHeader>
+            <SidebarHeader className="gap-2">
                 <SidebarMenu>
                     <SidebarMenuItem>
-                        <SidebarMenuButton size="lg" asChild>
-                            <Link href={dashboard()} prefetch>
-                                <AppLogo />
+                        <SidebarMenuButton size="lg" asChild className="p-0 hover:bg-transparent active:bg-transparent focus-visible:ring-0">
+                            <Link href={dashboard()} prefetch className="w-full">
+                                <img
+                                    src="/assets/images/yeslogo.png"
+                                    alt="YES Logo"
+                                    className="h-10 rounded-md object-contain"
+                                />
                             </Link>
                         </SidebarMenuButton>
                     </SidebarMenuItem>
@@ -77,8 +67,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <SidebarFooter>
-                <NavFooter items={footerNavItems} className="mt-auto" />
-                <NavUser />
+                
             </SidebarFooter>
         </Sidebar>
     );

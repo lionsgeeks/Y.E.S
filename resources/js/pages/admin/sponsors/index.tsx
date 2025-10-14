@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -8,19 +8,32 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, ExternalLink, Building2 } from 'lucide-react';
+import { Plus, Edit, Trash2, ExternalLink, Building2, ChevronLeft, ChevronRight } from 'lucide-react';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 
-export default function SponsorsIndex({ sponsors }) {
+type Sponsor = { id: number; name: string; type: string; website_url?: string | null; description?: string | object; created_at: string };
+
+export default function SponsorsIndex({ sponsors }: { sponsors: Sponsor[] }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editingSponsor, setEditingSponsor] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
     const [formData, setFormData] = useState({
         name: '',
         type: 'sponsor',
         website_url: '',
         description: '',
     });
+
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(sponsors.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentSponsors = useMemo(() => sponsors.slice(startIndex, endIndex), [sponsors, startIndex, endIndex]);
+
+    const goToPage = (page: number) => {
+        setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -153,7 +166,7 @@ export default function SponsorsIndex({ sponsors }) {
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {sponsors.map((sponsor) => (
+                    {currentSponsors.map((sponsor) => (
                         <Card key={sponsor.id} className="hover:shadow-lg transition-shadow">
                             <CardHeader>
                                 <div className="flex items-center justify-between">
@@ -225,6 +238,39 @@ export default function SponsorsIndex({ sponsors }) {
                             </Button>
                         </CardContent>
                     </Card>
+                )}
+
+                {sponsors.length > 0 && totalPages > 1 && (
+                    <div className="flex items-center justify-between pt-8">
+                        <div className="text-sm text-gray-600">
+                            Showing {startIndex + 1} to {Math.min(endIndex, sponsors.length)} of {sponsors.length} sponsors
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => goToPage(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="flex items-center"
+                            >
+                                <ChevronLeft className="w-4 h-4 mr-1" />
+                                Previous
+                            </Button>
+                            <span className="text-sm text-gray-600">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => goToPage(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="flex items-center"
+                            >
+                                Next
+                                <ChevronRight className="w-4 h-4 ml-1" />
+                            </Button>
+                        </div>
+                    </div>
                 )}
 
                 {/* Edit Dialog */}

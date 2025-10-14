@@ -28,11 +28,12 @@ export function NavUser() {
                     <DropdownMenuTrigger asChild>
                         <SidebarMenuButton
                             size="lg"
-                            className="group text-sidebar-accent-foreground data-[state=open]:bg-sidebar-accent"
+                            className="group text-sidebar-accent-foreground bg-transparent hover:bg-transparent active:bg-transparent data-[state=open]:bg-transparent ring-0 focus-visible:ring-0 outline-none border-transparent"
                             data-test="sidebar-menu-button"
+                            data-profile="true"
                         >
                             <UserInfo user={auth.user} />
-                            <ChevronsUpDown className="ml-auto size-4" />
+                            {/* <ChevronsUpDown className="ml-auto size-4" /> */}
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
