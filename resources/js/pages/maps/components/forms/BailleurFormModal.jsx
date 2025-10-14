@@ -17,6 +17,10 @@ const BailleurFormModal = ({ open, formData, setFormData, onSubmit, onClose, loa
                             <input type="text" name="nom" value={formData.nom} onChange={(e)=>setFormData({...formData, nom:e.target.value})} className="w-full p-2 border rounded-md" />
                         </div>
                         <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Logo (PNG/JPG - max 5MB)" ar="الشعار (PNG/JPG - 5MB)" fr="Logo (PNG/JPG - max 5MB)" /></label>
+                            <input name="logo_path" type="file" accept=".png,.jpg,.jpeg" onChange={(e)=>setFormData({...formData, logo_path:e.target.files?.[0]||null})} className="w-full text-sm file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" />
+                        </div>
+                        <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700"><TransText en="Institution Type" ar="نوع المؤسسة" fr="Type d'institution" /> <span className="text-red-500">*</span></label>
                             <select className="w-full p-2 border rounded-md" name="type_institution" value={formData.type_institution} onChange={(e)=>setFormData({...formData, type_institution:e.target.value})}>
                                 <option value=""><TransText en="Select..." ar="اختر..." fr="Sélectionner..." /></option>
@@ -31,6 +35,73 @@ const BailleurFormModal = ({ open, formData, setFormData, onSubmit, onClose, loa
                             <select onChange={(e)=>setFormData({...formData, pays_origine:Array.from(e.target.selectedOptions,(o)=>o.value)})} className="w-full p-2 border rounded-md" name="pays_origine" multiple>
                                 {data.map((item) => (<option key={item.id} value={item.value}>{item.name}</option>))}
                             </select>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Geographic Coverage" ar="التغطية الجغرافية" fr="Couverture géographique" /> <span className="text-red-500">*</span></label>
+                            <div className="flex flex-col max-h-40 overflow-y-auto border rounded p-2">
+                                {data.map((item)=> (
+                                    <label key={item.name} className="flex items-center">
+                                        <input type="checkbox" checked={Array.isArray(formData.couverture_geographique)&&formData.couverture_geographique.includes(item.name)} onChange={(e)=>{
+                                            const {checked} = e.target;
+                                            setFormData((prev)=>{
+                                                const next = new Set(prev.couverture_geographique||[]);
+                                                checked ? next.add(item.name) : next.delete(item.name);
+                                                return {...prev, couverture_geographique:Array.from(next)};
+                                            })
+                                        }} />
+                                        <span className="ml-2">{item.name}</span>
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Website" ar="الموقع الإلكتروني" fr="Site web" /></label>
+                            <input type="url" name="site_web" value={formData.site_web||''} onChange={(e)=>setFormData({...formData, site_web:e.target.value})} className="w-full p-2 border rounded-md" />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Contact Email" ar="البريد الإلكتروني للاتصال" fr="Email de contact" /></label>
+                            <input type="email" name="email_contact" value={formData.email_contact||''} onChange={(e)=>setFormData({...formData, email_contact:e.target.value})} className="w-full p-2 border rounded-md" />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Phone" ar="الهاتف" fr="Téléphone" /></label>
+                            <div className="flex">
+                                <select value={formData.telephone_code||''} onChange={(e)=>setFormData({...formData, telephone_code:e.target.value})} className="w-[5rem] p-2 border rounded-l-md border-gray-300 bg-white">
+                                    <option value=""><TransText en="+Code" ar="+الرمز" fr="+Indicatif" /></option>
+                                    {indicatif?.sort((a,b)=>a.dial_code.localeCompare(b.dial_code)).map((item)=> (
+                                        <option key={item.id} value={item.dial_code}>{item.dial_code}</option>
+                                    ))}
+                                </select>
+                                <input type="tel" name="telephone_number" value={formData.telephone_number||''} onChange={(e)=>setFormData({...formData, telephone_number:e.target.value})} className="w-2/3 p-2 border border-l-0 rounded-r-md border-gray-300" placeholder="Numéro" />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Responsible Contact" ar="جهة الاتصال المسؤولة" fr="Contact responsable" /></label>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+                                <input type="text" placeholder="Nom" className="p-2 border rounded-md" value={formData?.contact_responsable?.nom||''} onChange={(e)=>setFormData((p)=>({...p, contact_responsable:{...(p.contact_responsable||{}), nom:e.target.value}}))} />
+                                <input type="text" placeholder="Fonction" className="p-2 border rounded-md" value={formData?.contact_responsable?.fonction||''} onChange={(e)=>setFormData((p)=>({...p, contact_responsable:{...(p.contact_responsable||{}), fonction:e.target.value}}))} />
+                                <input type="email" placeholder="Email" className="p-2 border rounded-md" value={formData?.contact_responsable?.email||''} onChange={(e)=>setFormData((p)=>({...p, contact_responsable:{...(p.contact_responsable||{}), email:e.target.value}}))} />
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Social Media" ar="وسائل التواصل الاجتماعي" fr="Réseaux sociaux" /></label>
+                            <div className="flex items-center gap-2">
+                                <input type="checkbox" checked={!!formData?.reseaux_sociaux?.linkedin} onChange={()=>setFormData((p)=>({...p, reseaux_sociaux:{...(p.reseaux_sociaux||{}), linkedin:!(p.reseaux_sociaux?.linkedin)}}))} className="h-4 w-4" />
+                                <span>LinkedIn</span>
+                            </div>
+                            {formData?.reseaux_sociaux?.linkedin && (
+                                <input type="url" placeholder="https://linkedin.com/company/..." value={formData.linkedin_url2||''} onChange={(e)=>setFormData({...formData, linkedin_url2:e.target.value})} className="w-full p-2 border rounded-md" />
+                            )}
+                            <div className="flex items-center gap-2 mt-2">
+                                <input type="checkbox" checked={!!formData?.reseaux_sociaux?.twitter} onChange={()=>setFormData((p)=>({...p, reseaux_sociaux:{...(p.reseaux_sociaux||{}), twitter:!(p.reseaux_sociaux?.twitter)}}))} className="h-4 w-4" />
+                                <span>Twitter</span>
+                            </div>
+                            {formData?.reseaux_sociaux?.twitter && (
+                                <input type="url" placeholder="https://twitter.com/..." value={formData.twitter_url2||''} onChange={(e)=>setFormData({...formData, twitter_url2:e.target.value})} className="w-full p-2 border rounded-md" />
+                            )}
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Best Practices (100 words max)" ar="أفضل الممارسات" fr="Bonnes Pratiques (100 mots max)" /></label>
+                            <textarea className="w-full p-2 border rounded-md" rows="3" name="priorites_thematiques" value={formData.priorites_thematiques||''} onChange={(e)=>setFormData({...formData, priorites_thematiques:e.target.value})}></textarea>
                         </div>
                     </div>
                 </fieldset>

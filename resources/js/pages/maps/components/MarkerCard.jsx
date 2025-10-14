@@ -43,11 +43,13 @@ const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
                 return (
                     <div className="flex flex-col sm:flex-row items-center bg-white/90  shadow-md rounded-xl p-4 gap-4 w-96 sm:w-[40vw] mx-auto mt-20 md:mt-0 relative ">
                         <div className="w-[70%]">
-                            <img
-                                src={storageBaseUrl + `/storage/${details.showable.logo || details.showable.logo_path || ''}`}
-                                alt={`${details.showable.name} logo`}
-                                className="w-80 h-52 object-cover rounded-md"
-                            />
+                            <div className="w-80 h-52 rounded-md overflow-hidden flex items-center justify-center bg-white">
+                                <img
+                                    src={`/storage/${details.showable.logo}`}
+                                    alt={`${details.showable.name} logo`}
+                                    className="w-full h-full object-contain"
+                                />
+                            </div>
                         </div>
 
                         <div className="flex flex-col w-96 sm:w-2/3 justify-between gap-1 text-sm text-gray-800 px-4 ">

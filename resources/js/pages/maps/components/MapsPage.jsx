@@ -32,6 +32,7 @@ export default function MapsPage() {
     const [selectedRegion, setSelectedRegion] = useState("");
     const [selectedPhoneCode, setSelectedPhoneCode] = useState("");
     const [errors, setErrors] = useState({});
+    const [successOpen, setSuccessOpen] = useState(false);
     const mapRef = useRef();
     const mapContainerRef = useRef();
     const initial_position = [20.9394, 6.6111];
@@ -48,6 +49,7 @@ export default function MapsPage() {
     const [agenceForm, setAgenceForm] = useState({});
     const [publiqueForm, setPubliqueForm] = useState({});
     const [academiqueForm, setAcademiqueForm] = useState({});
+    const [extraColumns, setExtraColumns] = useState([]);
     const [regForm, setRegForm] = useState({ name: "", email: "", code: "" });
     const storageBaseUrl = '';
     const regUseForm = useForm({ name: "", email: "", code: "" });
@@ -105,7 +107,7 @@ export default function MapsPage() {
             return;
         }
         // Fallback: fetch from API that returns a flat array [{id,type,lat,lng,name,logo}]
-        fetch('/api/approved')
+        fetch('/approved')
             .then((r) => r.json())
             .then((arr) => {
                 if (!Array.isArray(arr)) return;
@@ -137,13 +139,31 @@ export default function MapsPage() {
         if (!newPosition?.lat || !newPosition?.lng) return;
         storeUseForm.setData({ type, payload, lat: newPosition.lat, lng: newPosition.lng });
         setLoading(true);
+        if (storeUseForm.processing) return; // prevent double submit
         storeUseForm.post('/maps', {
             preserveScroll: true,
-            onSuccess: () => { window.location.reload(); },
+            forceFormData: true,
+            onSuccess: () => { 
+                // Close all modals and show the success overlay on top
+                setShowModal(false);
+                setShowOrgModal(false);
+                setOpenCardIndex(null);
+                setStep(1);
+                setSuccessOpen(true);
+            },
             onError: () => setError('Failed to save'),
             onFinish: () => setLoading(false),
         });
     };
+    // Load schema for selected type to render extra optional fields
+    const loadSchema = async (type) => {
+        try {
+            const r = await fetch(`/maps/schema/${type}`)
+            const j = await r.json()
+            const cols = Array.isArray(j.columns) ? j.columns : []
+            setExtraColumns(cols)
+        } catch {}
+    }
 
     useEffect(() => {
         mapboxgl.accessToken = "pk.eyJ1IjoiaGFtemFvZmsiLCJhIjoiY2x3MnN0cmRrMHJoYTJpb2N2OGQ2eTNnOSJ9.aLy9CQtGLr0A3rlH3x2TRg";
@@ -218,32 +238,45 @@ export default function MapsPage() {
                 form={regForm}
                 setForm={setRegForm}
                 onRegister={async ({ name, email }) => {
+                    if (regUseForm.processing) return; // debounce
                     if (!name || !email) return;
                     setError("");
-                    regUseForm.setData({ ...regUseForm.data, name, email });
+                    regUseForm.setData({ ...regUseForm.data, name: (name||'').trim(), email: (email||'').trim().toLowerCase() });
                     setLoading(true);
                     regUseForm.post('/maps/register', {
                         preserveScroll: true,
-                        onSuccess: () => setStep(2),
+                        onSuccess: () => { setError(''); setStep(2); },
                         onError: () => setError('Failed to send code'),
                         onFinish: () => setLoading(false),
                     });
                 }}
                 onVerify={async ({ email, code }) => {
+                    if (regUseForm.processing) return; // debounce
                     if (!email || !code) return;
                     setError("");
-                    regUseForm.setData({ ...regUseForm.data, email, code });
+                    regUseForm.setData({ ...regUseForm.data, email: (email||'').trim().toLowerCase(), code: (code||'').trim() });
                     setLoading(true);
                     regUseForm.post('/maps/verify', {
                         preserveScroll: true,
-                        onSuccess: () => setStep(3),
+                        onSuccess: () => { setError(''); setStep(3); },
                         onError: () => setError('Invalid or expired code'),
                         onFinish: () => setLoading(false),
                     });
                 }}
             />
-            <OrgTypeSelectorModal open={step === 3 && !showOrgModal} onClose={()=>setStep(1)} onSelect={(val)=>{ if (val) { setSelectedForm(val); setShowOrgModal(true); } }} />
-            <OscFormModal open={showOrgModal && selectedForm==='osc'} formData={orgForm} setFormData={setOrgForm} onSubmit={(e)=>handleSubmit(e,'organizations',orgForm)} onClose={()=>setShowOrgModal(false)} loading={loading} />
+            {successOpen && (
+                <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60">
+                    <div className="bg-white rounded-lg p-6 w-[min(90vw,480px)] text-center">
+                        <h3 className="text-xl font-semibold mb-2 text-green-700">Saved successfully</h3>
+                        <p className="text-gray-600 mb-4">Your submission has been received.</p>
+                        <button className="bg-green-600 text-white px-4 py-2 rounded" onClick={() => { setSuccessOpen(false); setShowOrgModal(false); setShowModal(false); setOpenCardIndex(null); setStep(1); }}>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            )}
+            <OrgTypeSelectorModal open={step === 3 && !showOrgModal} onClose={()=>setStep(1)} onSelect={(val)=>{ if (val) { setSelectedForm(val); setShowOrgModal(true); loadSchema(val==='osc'?'organizations':val); } }} />
+            <OscFormModal open={showOrgModal && selectedForm==='osc'} formData={orgForm} setFormData={setOrgForm} onSubmit={(e)=>handleSubmit(e,'organizations',orgForm)} onClose={()=>setShowOrgModal(false)} loading={loading} extraColumns={extraColumns} />
             <BailleurFormModal open={showOrgModal && selectedForm==='bailleurs'} formData={bailleurForm} setFormData={setBailleurForm} onSubmit={(e)=>handleSubmit(e,'bailleurs',bailleurForm)} onClose={()=>setShowOrgModal(false)} loading={loading} />
             <EntrepriseFormModal open={showOrgModal && selectedForm==='entreprises'} formData={entrepriseForm} setFormData={setEntrepriseForm} onSubmit={(e)=>handleSubmit(e,'entreprises',entrepriseForm)} onClose={()=>setShowOrgModal(false)} loading={loading} />
             <AgenceFormModal open={showOrgModal && selectedForm==='agences'} formData={agenceForm} setFormData={setAgenceForm} onSubmit={(e)=>handleSubmit(e,'agences',agenceForm)} onClose={()=>setShowOrgModal(false)} loading={loading} />

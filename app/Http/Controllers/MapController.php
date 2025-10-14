@@ -13,12 +13,39 @@ use Illuminate\Database\Schema\Blueprint;
 
 class MapController extends Controller
 {
+    
     public function index()
     {
         $shows = Show::with('showable')->where('approve', true)->get()->groupBy('showable_type');
         return inertia('maps/maps', [
             'approved' => $shows,
         ]);
+    }
+
+    // Former API: return flat approved markers list (for clients that still call it)
+    public function approved()
+    {
+        $shows = Show::with('showable')->where('approve', true)->get();
+        $flat = $shows->map(function ($s) {
+            $entity = $s->showable;
+            $name = $s->showable_type === \App\Models\Organization::class
+                ? ($entity->name ?? null)
+                : ($s->showable_type === \App\Models\Publique::class
+                    ? ($entity->institution_name ?? null)
+                    : ($entity->nom ?? null));
+        	$logoCol = $entity->logo ?? $entity->logo_path ?? null;
+            return [
+                'id' => $s->showable_type . '-' . $s->showable_id,
+                'type' => $s->showable_type,
+                'lat' => $entity->lat ?? null,
+                'lng' => $entity->lng ?? null,
+                'name' => $name,
+                'logo' => $logoCol,
+                'showable' => $entity,
+            ];
+        })->filter(fn($m) => !is_null($m['lat']) && !is_null($m['lng']))->values();
+
+        return response()->json($flat);
     }
 
     public function store(Request $request)
@@ -30,7 +57,7 @@ class MapController extends Controller
             'lng' => 'required|numeric',
         ]);
 
-        DB::transaction(function () use ($data) {
+        DB::transaction(function () use ($data, $request) {
             $modelClass = [
                 'organizations' => \App\Models\Organization::class,
                 'bailleurs' => \App\Models\Bailleur::class,
@@ -41,6 +68,33 @@ class MapController extends Controller
             ][$data['type']];
 
             $payload = $data['payload'];
+
+            // Handle uploaded logo files and normalize to 'logos/{filename}'
+            $saveLogo = function($file) {
+                if (!$file) return null;
+                $name = preg_replace('/[^A-Za-z0-9._-]/', '_', $file->getClientOriginalName());
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('logos', $file, $name);
+                return 'logos/' . $name;
+            };
+
+            $uploadedLogo = $request->file('payload.logo') ?? $request->file('logo') ?? null;
+            if ($uploadedLogo) {
+                $payload['logo'] = $saveLogo($uploadedLogo);
+            }
+            $uploadedLogoPath = $request->file('payload.logo_path') ?? $request->file('logo_path') ?? null;
+            if ($uploadedLogoPath) {
+                $payload['logo_path'] = $saveLogo($uploadedLogoPath);
+            }
+
+            // If logo fields are strings with absolute paths, collapse to basename under logos/
+            foreach (['logo','logo_path'] as $logoKey) {
+                if (!empty($payload[$logoKey]) && is_string($payload[$logoKey])) {
+                    $base = basename(str_replace('\\\\','/', $payload[$logoKey]));
+                    if ($base && $base !== $payload[$logoKey]) {
+                        $payload[$logoKey] = 'logos/' . $base;
+                    }
+                }
+            }
 
             // Normalize payload per type to satisfy existing NOT NULL constraints and JSON columns
             $jsonDefaults = function(array $keys) use (&$payload) {
@@ -53,42 +107,6 @@ class MapController extends Controller
                     $payload[$k] = json_encode($value);
                 }
             };
-
-            // Whitelists per live schema to avoid inserting unknown columns
-            $whitelists = [
-                'organizations' => [
-                    'name','logo','creation_year','legal_status','other_legal_status','country','regions','website',
-                    'social_facebook','social_twitter','social_linkedin','social_instagram','facebook_url','twitter_url',
-                    'linkedin_url','instagram_url','main_email','phone','postal_address','contact_name','contact_function',
-                    'contact_email','intervention_areas','target_groups','annual_beneficiaries','program_title','program_description',
-                    'methodological_approach','result1','result2','result3','technical_partners','financial_partners','lat','lng','is_approved','user_id'
-                ],
-                'bailleurs' => [
-                    'nom','logo_path','type_institution','pays_origine','couverture_geographique','site_web','twitter','linkedin',
-                    'twitter_url2','linkedin_url2','email_contact','telephone','contact_responsable','priorites_thematiques','lat','lng','user_id'
-                ],
-                'entreprises' => [
-                    'nom','logo','secteur','taille','pays_siege','regions_afrique','site_web','twitter','linkedin','twitter_url','linkedin_url',
-                    'email_contact','telephone','contact_rse','politique_inclusion','programmes_integration','postes_stages_annuels','dispositifs_formation',
-                    'partenariats_osc','initiatives_mecenat','competences_pro_bono','profils_recherches','regions_recrutement','processus_integration','lat','lng','user_id'
-                ],
-                'agences' => [
-                    'nom','logo','type_organisation','pays_representes','couverture_afrique','site_web','email_institutionnel','bureaux_afrique','contact_jeunesse',
-                    'cadre_strategique','priorites_thematiques','budget','annee_debut','annee_fin','programmes_phares','outils_methodologiques','opportunites_financement',
-                    'type_partenaires','mecanismes_collaboration','domaines_expertise','lat','lng','user_id'
-                ],
-                'publiques' => [
-                    'institution_name','institution_type','country','website','logo_path','email','phone_code','phone_number','address','youth_contact_name',
-                    'youth_contact_position','youth_contact_email','policy_framework','strategic_priorities','annual_budget','flagship_program','target_audience',
-                    'support_mechanisms','expected_result_1','expected_result_2','expected_result_3','execution_partners','coordination_mechanism','involved_actors',
-                    'monitoring_approach','technical_assistance','best_practices','lat','lng','cooperation_opportunities'
-                ],
-                'academiques' => [
-                    'nom','logo_path','type_institution','pays','site_web','departement','email','telephone','contact_nom','contact_fonction','contact_email',
-                    'axes_recherche','methodologies','zones_geographiques','programmes_formation','public_cible','modalites','certifications','partenaires_recherche',
-                    'ressources_disponibles','expertise','opportunites_collaboration','conferences','ateliers','lat','lng','publications'
-                ],
-            ];
 
             // Per-type key mapping from form keys to DB column names
             $mapKeys = function(array $map, array $arr): array {
@@ -137,9 +155,10 @@ class MapController extends Controller
             $payload['lat'] = $data['lat'];
             $payload['lng'] = $data['lng'];
 
-            // Whitelist attributes for the entity to avoid invalid column inserts
-            $allowed = $whitelists[$data['type']] ?? array_keys($payload);
-            $filtered = array_intersect_key($payload, array_flip($allowed));
+            // Determine allowed columns dynamically from the model's table
+            $table = (new $modelClass())->getTable();
+            $columns = Schema::getColumnListing($table);
+            $filtered = array_intersect_key($payload, array_flip($columns));
 
             // Bypass mass-assignment differences by setting attributes directly
             $entity = new $modelClass();
@@ -167,6 +186,7 @@ class MapController extends Controller
                 'name' => 'required|string',
                 'email' => 'required|email',
             ]);
+            $data['email'] = strtolower(trim($data['email']));
             // Ensure verification table exists to avoid 500 on fresh DBs
             if (!Schema::hasTable('map_verifications')) {
                 Schema::create('map_verifications', function (Blueprint $table) {
@@ -198,8 +218,10 @@ class MapController extends Controller
                 'email' => 'required|email',
                 'code' => 'required|string',
             ]);
-            $record = MapVerification::where('email', $data['email'])->first();
-            if (!$record || $record->code !== $data['code'] || ($record->expires_at && $record->expires_at->isPast())) {
+            $email = strtolower(trim($data['email']));
+            $code = trim($data['code']);
+            $record = MapVerification::where('email', $email)->first();
+            if (!$record || trim((string)$record->code) !== $code || ($record->expires_at && $record->expires_at->isPast())) {
                 return back()->withErrors(['code' => 'Invalid or expired code']);
             }
             $record->forceFill(['verified' => true])->save();
@@ -207,6 +229,38 @@ class MapController extends Controller
         } catch (\Throwable $e) {
             return back()->withErrors(['verify' => $e->getMessage()]);
         }
+    }
+
+    // Return DB columns for a given entity type so the frontend can render optional fields
+    public function schema(string $type)
+    {
+        $map = [
+            'organizations' => \App\Models\Organization::class,
+            'bailleurs' => \App\Models\Bailleur::class,
+            'entreprises' => \App\Models\Entreprise::class,
+            'agences' => \App\Models\Agence::class,
+            'publiques' => \App\Models\Publique::class,
+            'academiques' => \App\Models\Academique::class,
+        ];
+        if (!isset($map[$type])) {
+            return response()->json(['error' => 'Unknown type'], 404);
+        }
+        $model = new $map[$type]();
+        $table = $model->getTable();
+        // Use PRAGMA to fetch column names and types for SQLite
+        $raw = \Illuminate\Support\Facades\DB::select("PRAGMA table_info('{$table}')");
+        $hidden = ['id','created_at','updated_at','user_id','lat','lng'];
+        $cols = [];
+        foreach ($raw as $col) {
+            $name = $col->name ?? '';
+            if (in_array($name, $hidden, true)) continue;
+            $cols[] = [
+                'name' => $name,
+                'type' => strtolower((string)($col->type ?? '')),
+                'notnull' => (int)($col->notnull ?? 0) === 1,
+            ];
+        }
+        return response()->json(['table' => $table, 'columns' => $cols]);
     }
 }
 

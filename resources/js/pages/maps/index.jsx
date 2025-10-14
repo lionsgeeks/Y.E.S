@@ -3,28 +3,35 @@ import Footer from '@/components/footer'
 import MapView from '@/components/MapView'
 import MarkerList from '@/components/MarkerList'
 import { useEffect, useMemo, useState } from 'react'
+import { usePage } from '@inertiajs/react'
 
 export default function MapsIndex() {
     const [markers, setMarkers] = useState([])
     const [query, setQuery] = useState('')
+    const { props } = usePage()
 
     useEffect(() => {
-        fetch('/api/approved')
-            .then((r) => r.json())
-            .then((data) => {
-                const mks = Array.isArray(data)
-                    ? data.map((e) => ({
-                          id: e.id,
-                          lat: e.lat,
-                          lng: e.lng,
-                          name: e.name,
-                          logo: e.logo ? `/storage/${e.logo}` : undefined,
-                      }))
-                    : []
-                setMarkers(mks)
-            })
-            .catch(() => {})
-    }, [])
+        const grouped = props?.approved || {}
+        const flat = Object.values(grouped).flat()
+        const mks = flat
+            .filter((e) => e?.showable?.lat && e?.showable?.lng)
+            .map((e) => ({
+                id: `${e.showable_type}-${e.showable.id}`,
+                lat: e.showable.lat,
+                lng: e.showable.lng,
+                name:
+                    e.showable_type === 'App\\Models\\Organization'
+                        ? e.showable.name
+                        : e.showable_type === 'App\\Models\\Publique'
+                        ? e.showable.institution_name
+                        : e.showable.nom,
+                logo: (() => {
+                    const raw = e.showable.logo || e.showable.logo_path
+                    return raw ? `/storage/${String(raw).split('/').pop()}` : undefined
+                })(),
+            }))
+        setMarkers(mks)
+    }, [props?.approved])
 
     const filtered = useMemo(() => {
         if (!query) return markers
