@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ArticleController;
 use App\Models\Article;
+use App\Http\Resources\ArticleResource;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -17,7 +18,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 Route::get('/articles', function () {
     $articles = Article::all();
     return Inertia::render('client/articles/index', [
-        'articles' => $articles
+        'articles' => ArticleResource::collection($articles)->resolve(),
     ]);
 })->name('acticles');
 
@@ -26,7 +27,7 @@ Route::get('/articles/{id}', function ($id) {
     $articles = Article::all();
 
     return Inertia::render('client/articles/[id]', [
-        'article' => $article,
-        'articles' => $articles,
+        'article' => (new ArticleResource($article))->resolve(),
+        'articles' => ArticleResource::collection($articles)->resolve(),
     ]);
 })->name('article.show');

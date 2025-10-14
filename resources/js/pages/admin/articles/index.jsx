@@ -67,7 +67,7 @@ const Articles = ({ articles }) => {
                             {/* Image */}
                             {article.image && (
                                 <img
-                                    src={article.image}
+                                    src={'/storage/app/public/articles/'+article.image}
                                     alt={article.title.en}
                                     className="w-full h-28 sm:h-32 md:h-36 object-cover"
                                 />

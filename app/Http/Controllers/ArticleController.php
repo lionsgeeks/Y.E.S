@@ -17,7 +17,7 @@ class ArticleController extends Controller
     {
         $articles = Article::all();
         return Inertia::render('admin/articles/index', [
-            'articles' => $articles
+            'articles' => $articles,
         ]);
     }
 
@@ -30,17 +30,53 @@ class ArticleController extends Controller
     }
     public function store(Request $request)
     {
-        //
+        // ✅ Validate all required fields
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
+            'image' => 'required|file|image|max:20480',
+        ]);
+
+        // ✅ Handle image upload
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('articles', 'public');
+        } else {
+            return back()->withErrors(['image' => 'Image upload failed']);
+        }
+
+        // ✅ Save the article (adjust model/DB fields as needed)
+        // Cast string inputs to objects to match Article casts (title/description/tags as object)
+        $article = Article::create([
+            'title' => [ 'en' => $validated['title'] ],
+            'description' => [ 'en' => $validated['description'] ],
+            // store relative path in DB
+            'image' => $imagePath,
+            // store localized tags as arrays for en/ar
+            'tags' => [
+                'en' => isset($validated['tags']) ? array_values($validated['tags']) : [],
+                'ar' => isset($validated['tags']) ? array_values($validated['tags']) : [],
+            ],
+        ]);
+
+        // ✅ Attach tags if your Article model uses a relation
+        // If there is a relation later, we can sync here. For now we persist tags JSON on the model.
+
+        // ✅ Redirect with success message (Inertia-friendly)
+        return redirect()->route('admin.articles')
+            ->with('success', 'Article created successfully!');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show() {}
 
-    /**
-     * Update the specified resource in storage.
-     */
+    // /**
+    //  * Display the specified resource.
+    //  */
+    // public function show() {}
+
+    // /**
+    //  * Update the specified resource in storage.
+    //  */
     public function edit($id)
     {
         $article = Article::find($id);
