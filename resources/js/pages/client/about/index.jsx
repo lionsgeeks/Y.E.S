@@ -4,13 +4,13 @@ import React from 'react';
 import { AboutSection } from './partials/AboutSection';
 import { OrganizatesSection } from './partials/OrganizatesSection';
 
-const About = () => {
+const About = ({sponsors}) => {
     return (
         <>
             <Navbar />
             <AboutSection />
             {/* <HistorySection /> */}
-            <OrganizatesSection />
+            <OrganizatesSection sponsors={sponsors} />
             <Footer />
         </>
     );

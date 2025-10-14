@@ -2,24 +2,24 @@ import { useEffect, useState } from "react";
 import { CommitteeSection } from "./CommitteeSection";
 import TransText from "@/components/TransText";
 
-export const OrganizatesSection = () => {
+export const OrganizatesSection = ({ sponsors }) => {
     const selectedLanguage = "en";
-    const [sponsors, setSponsors] = useState([]);
+    // const [sponsors, setSponsors] = useState([]);
 
-    useEffect(() => {
-        const fetchSponsors = async () => {
-            try {
-                const res = await fetch("/sponsors");
-                if (!res.ok) throw new Error("Failed to fetch sponsors");
-                const data = await res.json();
-                setSponsors(data);
-            } catch (err) {
-                console.error(err);
-            }
-        };
+    // useEffect(() => {
+    //     const fetchSponsors = async () => {
+    //         try {
+    //             const res = await fetch("/sponsors");
+    //             if (!res.ok) throw new Error("Failed to fetch sponsors");
+    //             const data = await res.json();
+    //             setSponsors(data);
+    //         } catch (err) {
+    //             console.error(err);
+    //         }
+    //     };
 
-        fetchSponsors();
-    }, []);
+    //     fetchSponsors();
+    // }, []);
 
     // Group sponsors by name (for handling double logos)
     const groupedSponsors = Object.values(
