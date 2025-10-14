@@ -53,7 +53,7 @@
         @vite([
             'resources/js/app.tsx',
             file_exists(resource_path("js/pages/{$page['component']}.jsx"))
-                ? "resources/js/pages/{$page['component']}.tsx"
+                ? "resources/js/pages/{$page['component']}.jsx"
                 : "resources/js/pages/{$page['component']}.jsx"
         ])
         @inertiaHead

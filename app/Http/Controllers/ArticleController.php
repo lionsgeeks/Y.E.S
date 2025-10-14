@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\ArticleResource;
 use App\Models\Article;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 
 class ArticleController extends Controller
 {
@@ -14,12 +15,19 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        //
+        $articles = Article::all();
+        return Inertia::render('admin/articles/index', [
+            'articles' => $articles
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
+    public function create()
+    {
+        return Inertia::render('admin/articles/partials/CreateArticle');
+    }
     public function store(Request $request)
     {
         //
@@ -28,14 +36,18 @@ class ArticleController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show()
-    {
-        return ArticleResource::collection(Article::orderBy('created_at', 'desc')->get());
-    }
+    public function show() {}
 
     /**
      * Update the specified resource in storage.
      */
+    public function edit($id)
+    {
+        $article = Article::find($id);
+        return Inertia::render('admin/articles/partials/EditArticle', [
+            'article' => $article
+        ]);
+    }
     public function update(Request $request, string $id)
     {
         //
@@ -44,8 +56,10 @@ class ArticleController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $article = Article::find($id);
+        $article->delete();
+        return redirect()->back()->with('success', 'Deleted article successfully');
     }
 }
