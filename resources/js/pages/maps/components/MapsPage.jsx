@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import axios from "axios";
+import { useForm } from "@inertiajs/react";
 import Drawer from "@components/Drawer";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -48,7 +49,15 @@ export default function MapsPage() {
     const [publiqueForm, setPubliqueForm] = useState({});
     const [academiqueForm, setAcademiqueForm] = useState({});
     const [regForm, setRegForm] = useState({ name: "", email: "", code: "" });
-    const url = "https://management.youthempowermentsummit.africa";
+    const storageBaseUrl = '';
+    const regUseForm = useForm({ name: "", email: "", code: "" });
+    const storeUseForm = useForm({ type: "", payload: {}, lat: null, lng: null });
+
+    // set CSRF header for axios
+    useEffect(() => {
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        if (token) axios.defaults.headers.common['X-CSRF-TOKEN'] = token;
+    }, []);
 
     useEffect(() => {
         handleFilter(selectedCategory, "");
@@ -90,8 +99,51 @@ export default function MapsPage() {
     };
 
     useEffect(() => {
-        axios.post(url + "/api/approved").then(r => setMarkersData(r.data)).catch(() => {});
+        const initial = window?.__inertiaProps__?.initialPage?.props?.approved;
+        if (initial && Object.keys(initial).length > 0) {
+            setMarkersData(initial);
+            return;
+        }
+        // Fallback: fetch from API that returns a flat array [{id,type,lat,lng,name,logo}]
+        fetch('/api/approved')
+            .then((r) => r.json())
+            .then((arr) => {
+                if (!Array.isArray(arr)) return;
+                const grouped = arr.reduce((acc, item) => {
+                    const type = item.type || '';
+                    if (!acc[type]) acc[type] = [];
+                    acc[type].push({
+                        showable_type: type,
+                        showable: item.showable || {
+                            id: item.id,
+                            name: item.name,
+                            institution_name: item.name,
+                            nom: item.name,
+                            logo: item.logo,
+                            logo_path: item.logo,
+                            lat: item.lat,
+                            lng: item.lng,
+                        },
+                    });
+                    return acc;
+                }, {});
+                setMarkersData(grouped);
+            })
+            .catch(() => {})
     }, []);
+
+    const handleSubmit = async (e, type, payload) => {
+        e.preventDefault();
+        if (!newPosition?.lat || !newPosition?.lng) return;
+        storeUseForm.setData({ type, payload, lat: newPosition.lat, lng: newPosition.lng });
+        setLoading(true);
+        storeUseForm.post('/maps', {
+            preserveScroll: true,
+            onSuccess: () => { window.location.reload(); },
+            onError: () => setError('Failed to save'),
+            onFinish: () => setLoading(false),
+        });
+    };
 
     useEffect(() => {
         mapboxgl.accessToken = "pk.eyJ1IjoiaGFtemFvZmsiLCJhIjoiY2x3MnN0cmRrMHJoYTJpb2N2OGQ2eTNnOSJ9.aLy9CQtGLr0A3rlH3x2TRg";
@@ -123,7 +175,7 @@ export default function MapsPage() {
                 const el = document.createElement("div"); el.className = "custom-marker";
                 const img = document.createElement("img");
                 const logoPath = marker.showable.logo || marker.showable.logo_path;
-                img.src = logoPath ? url + `/storage/${logoPath}` : "/default_logo.png";
+                img.src = logoPath ? `${storageBaseUrl}/storage/${logoPath}` : "/default_logo.png";
                 img.style.width = "25px"; img.style.height = "25px"; img.style.borderRadius = "50%";
                 img.style.border = "2px solid white"; img.style.objectFit = "cover"; el.appendChild(img);
                 const mapMarker = new mapboxgl.Marker(el).setLngLat([marker.showable?.lng, marker.showable.lat]).addTo(mapRef.current);
@@ -133,7 +185,7 @@ export default function MapsPage() {
             }
         });
         return () => { markersRef.current.forEach((m) => m.remove()); markersRef.current = []; };
-    }, [filtredData, url]);
+    }, [filtredData]);
 
     return (
         <>
@@ -149,21 +201,54 @@ export default function MapsPage() {
                         const isOpen = openCardIndex === uniqueKey;
                         return (
                             <div key={uniqueKey}>
-                                {isOpen && (<MarkerCard details={element} onClose={() => setOpenCardIndex(null)} storageBaseUrl={url} />)}
+                                {isOpen && (<MarkerCard details={element} onClose={() => setOpenCardIndex(null)} storageBaseUrl={storageBaseUrl} />)}
                             </div>
                         );
                     })
                 )}
             </div>
             <div className="tip" />
-            <RegistrationModal open={showModal && step < 3} step={step} setStep={setStep} onClose={() => setShowModal(false)} error={error} loading={loading} form={regForm} setForm={setRegForm} />
+            <RegistrationModal
+                open={showModal && step < 3}
+                step={step}
+                setStep={setStep}
+                onClose={() => setShowModal(false)}
+                error={error}
+                loading={loading || regUseForm.processing}
+                form={regForm}
+                setForm={setRegForm}
+                onRegister={async ({ name, email }) => {
+                    if (!name || !email) return;
+                    setError("");
+                    regUseForm.setData({ ...regUseForm.data, name, email });
+                    setLoading(true);
+                    regUseForm.post('/maps/register', {
+                        preserveScroll: true,
+                        onSuccess: () => setStep(2),
+                        onError: () => setError('Failed to send code'),
+                        onFinish: () => setLoading(false),
+                    });
+                }}
+                onVerify={async ({ email, code }) => {
+                    if (!email || !code) return;
+                    setError("");
+                    regUseForm.setData({ ...regUseForm.data, email, code });
+                    setLoading(true);
+                    regUseForm.post('/maps/verify', {
+                        preserveScroll: true,
+                        onSuccess: () => setStep(3),
+                        onError: () => setError('Invalid or expired code'),
+                        onFinish: () => setLoading(false),
+                    });
+                }}
+            />
             <OrgTypeSelectorModal open={step === 3 && !showOrgModal} onClose={()=>setStep(1)} onSelect={(val)=>{ if (val) { setSelectedForm(val); setShowOrgModal(true); } }} />
-            <OscFormModal open={showOrgModal && selectedForm==='osc'} formData={orgForm} setFormData={setOrgForm} onSubmit={(e)=>{e.preventDefault();}} onClose={()=>setShowOrgModal(false)} loading={loading} />
-            <BailleurFormModal open={showOrgModal && selectedForm==='bailleurs'} formData={bailleurForm} setFormData={setBailleurForm} onSubmit={(e)=>{e.preventDefault();}} onClose={()=>setShowOrgModal(false)} loading={loading} />
-            <EntrepriseFormModal open={showOrgModal && selectedForm==='entreprises'} formData={entrepriseForm} setFormData={setEntrepriseForm} onSubmit={(e)=>{e.preventDefault();}} onClose={()=>setShowOrgModal(false)} loading={loading} />
-            <AgenceFormModal open={showOrgModal && selectedForm==='agences'} formData={agenceForm} setFormData={setAgenceForm} onSubmit={(e)=>{e.preventDefault();}} onClose={()=>setShowOrgModal(false)} loading={loading} />
-            <PubliqueFormModal open={showOrgModal && selectedForm==='publiques'} formData={publiqueForm} setFormData={setPubliqueForm} onSubmit={(e)=>{e.preventDefault();}} onClose={()=>setShowOrgModal(false)} loading={loading} />
-            <AcademiqueFormModal open={showOrgModal && selectedForm==='academiques'} formData={academiqueForm} setFormData={setAcademiqueForm} onSubmit={(e)=>{e.preventDefault();}} onClose={()=>setShowOrgModal(false)} loading={loading} />
+            <OscFormModal open={showOrgModal && selectedForm==='osc'} formData={orgForm} setFormData={setOrgForm} onSubmit={(e)=>handleSubmit(e,'organizations',orgForm)} onClose={()=>setShowOrgModal(false)} loading={loading} />
+            <BailleurFormModal open={showOrgModal && selectedForm==='bailleurs'} formData={bailleurForm} setFormData={setBailleurForm} onSubmit={(e)=>handleSubmit(e,'bailleurs',bailleurForm)} onClose={()=>setShowOrgModal(false)} loading={loading} />
+            <EntrepriseFormModal open={showOrgModal && selectedForm==='entreprises'} formData={entrepriseForm} setFormData={setEntrepriseForm} onSubmit={(e)=>handleSubmit(e,'entreprises',entrepriseForm)} onClose={()=>setShowOrgModal(false)} loading={loading} />
+            <AgenceFormModal open={showOrgModal && selectedForm==='agences'} formData={agenceForm} setFormData={setAgenceForm} onSubmit={(e)=>handleSubmit(e,'agences',agenceForm)} onClose={()=>setShowOrgModal(false)} loading={loading} />
+            <PubliqueFormModal open={showOrgModal && selectedForm==='publiques'} formData={publiqueForm} setFormData={setPubliqueForm} onSubmit={(e)=>handleSubmit(e,'publiques',publiqueForm)} onClose={()=>setShowOrgModal(false)} loading={loading} />
+            <AcademiqueFormModal open={showOrgModal && selectedForm==='academiques'} formData={academiqueForm} setFormData={setAcademiqueForm} onSubmit={(e)=>handleSubmit(e,'academiques',academiqueForm)} onClose={()=>setShowOrgModal(false)} loading={loading} />
             <Footer />
         </>
     );

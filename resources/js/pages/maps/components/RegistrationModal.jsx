@@ -1,7 +1,7 @@
 import React from "react";
 import TransText from "@components/TransText";
 
-const RegistrationModal = ({ open, step, setStep, onClose, error, loading, form, setForm }) => {
+const RegistrationModal = ({ open, step, setStep, onClose, error, loading, form, setForm, onRegister, onVerify }) => {
     if (!open) return null;
     return (
         <div className="fixed inset-0 flex items-center justify-center bg-black/60 z-50">
@@ -27,7 +27,7 @@ const RegistrationModal = ({ open, step, setStep, onClose, error, loading, form,
                             <button onClick={onClose} className=" px-4 py-2 border border-beta text-alpha rounded">
                                 <TransText en="Cancel" ar="إلغاء" fr="Annuler" />
                             </button>
-                            <button onClick={() => setStep(2)} disabled={loading}
+                            <button onClick={() => onRegister?.(form)} disabled={loading}
                                     className="bg-beta text-white px-4 py-2 rounded  hover:bg-[#a68513] transition-colors duration-200">
                                 {loading ? (<TransText en="Sending..." ar="جاري الإرسال..." fr="Envoi..." />) : (<TransText en="Next" ar="التالي" fr="Suivant" />)}
                             </button>
@@ -43,7 +43,7 @@ const RegistrationModal = ({ open, step, setStep, onClose, error, loading, form,
                                onChange={(e) => setForm && setForm((p) => ({ ...p, code: e.target.value }))}
                                className="mb-4 w-full p-2 border border-gray-300 rounded" />
                         {error && <div className="text-red-500 mb-2">{error}</div>}
-                        <button onClick={() => setStep(3)} disabled={loading}
+                        <button onClick={() => onVerify?.(form)} disabled={loading}
                                 className="bg-alpha text-white px-4 py-2 rounded w-full hover:bg-[#24447f] transition-colors duration-200">
                             {loading ? (<TransText en="Verifying..." ar="جاري التحقق..." fr="Vérification..." />) : (<TransText en="Verify" ar="تحقق" fr="Vérifier" />)}
                         </button>

@@ -1,7 +1,41 @@
 import React from "react";
 
 const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
-    // Details are displayed in this modal; navigation not required.
+    // Normalize values for display (arrays/JSON -> comma list, empties -> dash)
+    const toArray = (val) => {
+        if (Array.isArray(val)) return val;
+        if (typeof val === 'string') {
+            const s = val.trim();
+            if (!s) return [];
+            // try JSON array
+            if ((s.startsWith('[') && s.endsWith(']'))) {
+                try { const parsed = JSON.parse(s); if (Array.isArray(parsed)) return parsed; } catch {}
+            }
+            // CSV fallback
+            if (s.includes(',')) return s.split(',').map((x) => x.trim()).filter(Boolean);
+            return [s];
+        }
+        return [];
+    };
+
+    const fmt = (val) => {
+        if (val === undefined || val === null) return '—'
+        if (typeof val === 'boolean') return val ? 'Yes' : 'No'
+        if (Array.isArray(val)) return val.filter(Boolean).join(', ')
+        if (typeof val === 'string') {
+            const s = val.trim()
+            if (!s) return '—'
+            // try parse JSON array
+            if ((s.startsWith('[') && s.endsWith(']')) || (s.startsWith('{') && s.endsWith('}'))) {
+                try {
+                    const parsed = JSON.parse(s)
+                    if (Array.isArray(parsed)) return parsed.filter(Boolean).join(', ')
+                } catch {}
+            }
+            return s
+        }
+        return String(val)
+    }
 
     const renderContent = () => {
         switch (details.showable_type) {
@@ -10,26 +44,18 @@ const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
                     <div className="flex flex-col sm:flex-row items-center bg-white/90  shadow-md rounded-xl p-4 gap-4 w-96 sm:w-[40vw] mx-auto mt-20 md:mt-0 relative ">
                         <div className="w-[70%]">
                             <img
-                                src={storageBaseUrl + `/storage/${details.showable.logo}`}
+                                src={storageBaseUrl + `/storage/${details.showable.logo || details.showable.logo_path || ''}`}
                                 alt={`${details.showable.name} logo`}
                                 className="w-80 h-52 object-cover rounded-md"
                             />
                         </div>
 
                         <div className="flex flex-col w-96 sm:w-2/3 justify-between gap-1 text-sm text-gray-800 px-4 ">
-                            <p className="font-bold text-lg text-beta">{details.showable.name}</p>
-                            <p>
-                                <span className="font-medium text-gray-500">Statut légal:</span> {details.showable.legal_status}
-                            </p>
-                            <p className="truncate">
-                                <span className="font-medium text-gray-500 ">Pays d'interventions :</span> {details.showable.regions}
-                            </p>
-                            <p className="truncate">
-                                <span className="font-medium text-gray-500">Groupes Cibles :</span> {details.showable.target_groups}
-                            </p>
-                            <p className="truncate">
-                                <span className="font-medium text-gray-500">Bonnes Pratiques :</span> {details.showable.program_title}
-                            </p>
+                            <p className="font-bold text-lg text-beta">{fmt(details.showable.name)}</p>
+                            <p><span className="font-medium text-gray-500">Statut légal:</span> {fmt(details.showable.legal_status)}</p>
+                            <p className="truncate"><span className="font-medium text-gray-500 ">Pays d'interventions :</span> {fmt(toArray(details.showable.intervention_areas || details.showable.regions || details.showable.country))}</p>
+                            <p className="truncate"><span className="font-medium text-gray-500">Groupes Cibles :</span> {fmt(toArray(details.showable.target_groups))}</p>
+                            <p className="truncate"><span className="font-medium text-gray-500">Bonnes Pratiques :</span> {fmt(details.showable.program_title || details.showable.methodological_approach || details.showable.program_description)}</p>
                             {/* Optional: add external links here if needed */}
                         </div>
                     </div>

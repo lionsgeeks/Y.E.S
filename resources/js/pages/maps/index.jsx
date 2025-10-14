@@ -9,26 +9,18 @@ export default function MapsIndex() {
     const [query, setQuery] = useState('')
 
     useEffect(() => {
-        fetch('https://management.youthempowermentsummit.africa/api/approved', { method: 'POST' })
+        fetch('/api/approved')
             .then((r) => r.json())
             .then((data) => {
-                const flat = Object.values(data).flat()
-                const mks = flat
-                    .filter((e) => e?.showable?.lat && e?.showable?.lng)
-                    .map((e) => ({
-                        id: `${e.showable_type}-${e.showable.id}`,
-                        lat: e.showable.lat,
-                        lng: e.showable.lng,
-                        name:
-                            e.showable_type === 'App\\Models\\Organization'
-                                ? e.showable.name
-                                : e.showable_type === 'App\\Models\\Publique'
-                                ? e.showable.institution_name
-                                : e.showable.nom,
-                        logo: e.showable.logo || e.showable.logo_path
-                            ? `https://management.youthempowermentsummit.africa/storage/${e.showable.logo || e.showable.logo_path}`
-                            : undefined,
-                    }))
+                const mks = Array.isArray(data)
+                    ? data.map((e) => ({
+                          id: e.id,
+                          lat: e.lat,
+                          lng: e.lng,
+                          name: e.name,
+                          logo: e.logo ? `/storage/${e.logo}` : undefined,
+                      }))
+                    : []
                 setMarkers(mks)
             })
             .catch(() => {})

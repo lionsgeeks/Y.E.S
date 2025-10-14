@@ -11,6 +11,8 @@ use App\Models\Sponsor;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\MapController as PagesMapController;
+use App\Http\Controllers\Api\MapController;
 
 Route::get('/', function () {
     $sponsors = [];
@@ -36,9 +38,10 @@ Route::get('/formulaire', function () {
 Route::get('/participants', function () {
     return Inertia::render('formulaire/sponsorsForm');
 })->name('participants');
-Route::get('/maps', function () {
-    return Inertia::render('maps/maps');
-})->name('maps');
+Route::get('/maps', [PagesMapController::class, 'index'])->name('maps');
+Route::post('/maps', [PagesMapController::class, 'store'])->name('maps.store');
+Route::post('/maps/register', [PagesMapController::class, 'register'])->name('maps.register');
+Route::post('/maps/verify', [PagesMapController::class, 'verify'])->name('maps.verify');
 
 
 
@@ -81,6 +84,8 @@ Route::get('/articles', function () {
     return Inertia::render('articles/arcticles');
 })->name('acticles');
 Route::post('/messages', [MesageController::class, 'store']);
+
+// Map API routes live in routes/api.php (stateless)
 
 require __DIR__ . '/settings.php';
 require __DIR__ . '/auth.php';
