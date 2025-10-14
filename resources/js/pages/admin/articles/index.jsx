@@ -14,6 +14,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import DeleteArticle from './partials/DeleteArticle';
 
 const breadcrumbs = [
     { title: 'Articles', href: '/admin/articles' },
@@ -105,27 +106,7 @@ const Articles = ({ articles }) => {
             </div>
 
             {/* 🧱 Delete Confirmation Dialog */}
-            <AlertDialog open={openDelete} onOpenChange={setOpenDelete}>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            This action cannot be undone. It will permanently delete the selected article.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel onClick={() => setOpenDelete(false)}>
-                            Cancel
-                        </AlertDialogCancel>
-                        <AlertDialogAction
-                            className="bg-red-500 hover:bg-red-600 text-white"
-                            onClick={() => deleteArticle(deleteId)}
-                        >
-                            Delete
-                        </AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-            </AlertDialog>
+            <DeleteArticle open={openDelete} setOpen={setOpenDelete} article={deleteId} setArticle={setDeleteId} />
         </AppLayout>
     );
 };
