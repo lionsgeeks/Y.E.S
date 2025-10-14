@@ -1,5 +1,5 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge';
 import { Plus, Edit, Trash2, ExternalLink, Building2, Upload, X, MoreVertical } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
+import { Pagination, PaginationContent, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 
 export default function SponsorsIndex({ sponsors }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -18,6 +19,7 @@ export default function SponsorsIndex({ sponsors }) {
     const [isDetailsOpen, setIsDetailsOpen] = useState(false);
     const [editingSponsor, setEditingSponsor] = useState(null);
     const [selectedSponsor, setSelectedSponsor] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
     const [formData, setFormData] = useState({
         name: '',
         type: 'sponsor',
@@ -30,6 +32,25 @@ export default function SponsorsIndex({ sponsors }) {
         type: 'all',
         search: '',
     });
+
+    const itemsPerPage = 10;
+
+    const filteredSponsors = sponsors.filter(sponsor => {
+        const matchesType = filters.type === 'all' || sponsor.type === filters.type;
+        const matchesSearch = sponsor.name.toLowerCase().includes(filters.search.toLowerCase());
+        return matchesType && matchesSearch;
+    });
+
+    const totalPages = Math.ceil(filteredSponsors.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentSponsors = useMemo(() => filteredSponsors.slice(startIndex, endIndex), [filteredSponsors, startIndex, endIndex]);
+
+    const goToPage = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -94,14 +115,6 @@ export default function SponsorsIndex({ sponsors }) {
         setIsDetailsOpen(true);
     };
 
-    // Filter sponsors based on current filters
-    const filteredSponsors = sponsors.filter(sponsor => {
-        const matchesType = filters.type === 'all' || sponsor.type === filters.type;
-        const matchesSearch = filters.search === '' || 
-            sponsor.name.toLowerCase().includes(filters.search.toLowerCase());
-        return matchesType && matchesSearch;
-    });
-
     // Get description in current language (defaulting to English)
     const getDescription = (description, language = 'en') => {
         if (typeof description === 'string') {
@@ -138,7 +151,7 @@ export default function SponsorsIndex({ sponsors }) {
         ]}>
             <Head title="Sponsors Management" />
 
-            <div className="space-y-6 relative">
+            <div className="py-10  relative">
                 {/* Background Pattern */}
                 <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-white/30 rounded-2xl -z-10"></div>
                 <div className="absolute inset-0 opacity-20 -z-10" style={{
@@ -147,7 +160,7 @@ export default function SponsorsIndex({ sponsors }) {
                 <div className="p-6">
                     <div className="flex items-center justify-between mb-6">
                         <div>
-                            <h1 className="text-2xl font-bold text-gray-900">Sponsors</h1>
+                            <h1 className="text-3xl font-bold text-gray-900">Sponsors</h1>
                             <p className="text-gray-500 text-sm">{filteredSponsors.length} of {sponsors.length} sponsors</p>
                         </div>
                         <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
@@ -157,96 +170,96 @@ export default function SponsorsIndex({ sponsors }) {
                                     Add Sponsor
                                 </Button>
                             </DialogTrigger>
-                        <DialogContent className="sm:max-w-[425px]">
-                            <DialogHeader>
-                                <DialogTitle>Add New Sponsor</DialogTitle>
-                                <DialogDescription>
-                                    Create a new sponsor, organizer, or technical partner.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <form onSubmit={handleSubmit} className="space-y-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="name">Name</Label>
-                                    <Input
-                                        id="name"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        placeholder="Enter sponsor name"
-                                        required
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="type">Type</Label>
-                                    <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
-                                        <SelectTrigger>
-                                            <SelectValue />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectItem value="sponsor">Sponsor</SelectItem>
-                                            <SelectItem value="organizer">Organizer</SelectItem>
-                                            <SelectItem value="technical_partner">Technical Partner</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="website_url">Website URL</Label>
-                                    <Input
-                                        id="website_url"
-                                        type="url"
-                                        value={formData.website_url}
-                                        onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
-                                        placeholder="https://example.com"
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="description">Description</Label>
-                                    <Textarea
-                                        id="description"
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        placeholder="Enter description"
-                                        rows={3}
-                                    />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="image">Sponsor Logo</Label>
+                            <DialogContent className="sm:max-w-[425px]">
+                                <DialogHeader>
+                                    <DialogTitle>Add New Sponsor</DialogTitle>
+                                    <DialogDescription>
+                                        Create a new sponsor, organizer, or technical partner.
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <form onSubmit={handleSubmit} className="space-y-4">
                                     <div className="space-y-2">
+                                        <Label htmlFor="name">Name</Label>
                                         <Input
-                                            id="image"
-                                            type="file"
-                                            accept="image/*"
-                                            onChange={handleImageChange}
-                                            className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#2e539d] file:text-white hover:file:bg-[#1e3d7a]"
+                                            id="name"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            placeholder="Enter sponsor name"
+                                            required
                                         />
-                                        {previewImage && (
-                                            <div className="relative inline-block">
-                                                <img
-                                                    src={previewImage}
-                                                    alt="Preview"
-                                                    className="w-32 h-32 object-contain border rounded-lg"
-                                                />
-                                                <button
-                                                    type="button"
-                                                    onClick={removeImage}
-                                                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
-                                                >
-                                                    <X className="w-4 h-4" />
-                                                </button>
-                                            </div>
-                                        )}
                                     </div>
-                                </div>
-                                <div className="flex justify-end space-x-2">
-                                    <Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)}>
-                                        Cancel
-                                    </Button>
-                                    <Button type="submit" className="bg-[#2e539d] hover:bg-[#1e3d7a] text-white">
-                                        <Plus className="w-4 h-4 mr-2" />
-                                        Create
-                                    </Button>
-                                </div>
-                            </form>
-                        </DialogContent>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="type">Type</Label>
+                                        <Select value={formData.type} onValueChange={(value) => setFormData({ ...formData, type: value })}>
+                                            <SelectTrigger>
+                                                <SelectValue />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                <SelectItem value="sponsor">Sponsor</SelectItem>
+                                                <SelectItem value="organizer">Organizer</SelectItem>
+                                                <SelectItem value="technical_partner">Technical Partner</SelectItem>
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="website_url">Website URL</Label>
+                                        <Input
+                                            id="website_url"
+                                            type="url"
+                                            value={formData.website_url}
+                                            onChange={(e) => setFormData({ ...formData, website_url: e.target.value })}
+                                            placeholder="https://example.com"
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="description">Description</Label>
+                                        <Textarea
+                                            id="description"
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            placeholder="Enter description"
+                                            rows={3}
+                                        />
+                                    </div>
+                                    <div className="space-y-2">
+                                        <Label htmlFor="image">Sponsor Logo</Label>
+                                        <div className="space-y-2">
+                                            <Input
+                                                id="image"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageChange}
+                                                className="file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#2e539d] file:text-white hover:file:bg-[#1e3d7a]"
+                                            />
+                                            {previewImage && (
+                                                <div className="relative inline-block">
+                                                    <img
+                                                        src={previewImage}
+                                                        alt="Preview"
+                                                        className="w-32 h-32 object-contain border rounded-lg"
+                                                    />
+                                                    <button
+                                                        type="button"
+                                                        onClick={removeImage}
+                                                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                                                    >
+                                                        <X className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex justify-end space-x-2">
+                                        <Button type="button" variant="ghost" onClick={() => setIsCreateOpen(false)}>
+                                            Cancel
+                                        </Button>
+                                        <Button type="submit" className="bg-[#2e539d] hover:bg-[#1e3d7a] text-white">
+                                            <Plus className="w-4 h-4 mr-2" />
+                                            Create
+                                        </Button>
+                                    </div>
+                                </form>
+                            </DialogContent>
                         </Dialog>
                     </div>
 
@@ -277,12 +290,12 @@ export default function SponsorsIndex({ sponsors }) {
                 </div>
 
                 <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 p-6">
-                    {filteredSponsors.map((sponsor) => (
+                    {currentSponsors.map((sponsor) => (
                         <Card key={sponsor.id} className="group hover:shadow-lg transition-all duration-200 border-0 bg-white/50 backdrop-blur-sm">
                             <CardContent className="p-4">
                                 <div className="flex flex-col items-center space-y-3">
                                     {/* Logo - Clickable for details */}
-                                    <div 
+                                    <div
                                         className="relative w-20 h-20 bg-white rounded-lg shadow-sm border flex items-center justify-center overflow-hidden cursor-pointer hover:shadow-md transition-shadow"
                                         onClick={() => handleShowDetails(sponsor)}
                                         title="Click to view details"
@@ -578,6 +591,40 @@ export default function SponsorsIndex({ sponsors }) {
                     </DialogContent>
                 </Dialog>
             </div>
+            {filteredSponsors.length > 0 && totalPages > 1 && (
+                <div className="flex justify-center pt-8 pb-6">
+                    <Pagination>
+                        <PaginationContent>
+                            <PaginationItem>
+                                <PaginationPrevious
+                                    onClick={() => goToPage(currentPage - 1)}
+                                    className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                />
+                            </PaginationItem>
+                            {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                <PaginationItem key={page}>
+                                    <PaginationLink
+                                        onClick={() => goToPage(page)}
+                                        isActive={currentPage === page}
+                                        className="cursor-pointer"
+                                    >
+                                        {page}
+                                    </PaginationLink>
+                                </PaginationItem>
+                            ))}
+                            <PaginationItem>
+                                <PaginationNext
+                                    onClick={() => goToPage(currentPage + 1)}
+                                    className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                />
+                            </PaginationItem>
+                        </PaginationContent>
+                    </Pagination>
+                </div>
+            )}
         </AppSidebarLayout>
     );
 }
+
+
+

@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
+import { Pagination, PaginationContent, PaginationEllipsis, PaginationItem, PaginationLink, PaginationNext, PaginationPrevious } from '@/components/ui/pagination';
 import { Plus, Edit, Trash2, Mail, User, Shield, Calendar } from 'lucide-react';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 
@@ -38,6 +39,18 @@ export default function UsersIndex({ users }) {
         }
     };
 
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 6;
+    const totalPages = Math.ceil(users.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+
+    const goToPage = (page) => {
+        if (page >= 1 && page <= totalPages) {
+            setCurrentPage(page);
+        }
+    };
+
     return (
         <AppSidebarLayout breadcrumbs={[
             { title: 'Dashboard', href: '/dashboard' },
@@ -45,7 +58,7 @@ export default function UsersIndex({ users }) {
         ]}>
             <Head title="User Management" />
 
-            <div className="space-y-6">
+            <div className="space-y-6 py-15">
                 <div className="flex items-center justify-between">
                     <div>
                         <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
@@ -110,7 +123,7 @@ export default function UsersIndex({ users }) {
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {users.map((user) => (
+                    {users.slice(startIndex, endIndex).map((user) => (
                         <Card key={user.id} className="hover:shadow-lg transition-shadow">
                             <CardHeader>
                                 <div className="flex items-center justify-between">
@@ -177,7 +190,42 @@ export default function UsersIndex({ users }) {
                         </CardContent>
                     </Card>
                 )}
+
+                {users.length > 0 && totalPages > 1 && (
+                    <div className="flex justify-center pt-8">
+                        <Pagination>
+                            <PaginationContent>
+                                <PaginationItem>
+                                    <PaginationPrevious 
+                                        onClick={() => goToPage(currentPage - 1)}
+                                        className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                    />
+                                </PaginationItem>
+                                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                                    <PaginationItem key={page}>
+                                        <PaginationLink
+                                            onClick={() => goToPage(page)}
+                                            isActive={currentPage === page}
+                                            className="cursor-pointer"
+                                        >
+                                            {page}
+                                        </PaginationLink>
+                                    </PaginationItem>
+                                ))}
+                                <PaginationItem>
+                                    <PaginationNext 
+                                        onClick={() => goToPage(currentPage + 1)}
+                                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                                    />
+                                </PaginationItem>
+                            </PaginationContent>
+                        </Pagination>
+                    </div>
+                )}
             </div>
         </AppSidebarLayout>
     );
 }
+
+
+
