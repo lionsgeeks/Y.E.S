@@ -11,8 +11,11 @@ const CreateArticle = () => {
     ];
 
     // Local states
-    const [title, setTitle] = useState('');
-    const [description, setDescription] = useState('');
+    const [activeLang, setActiveLang] = useState('en');
+    const [titleEn, setTitleEn] = useState('');
+    const [titleAr, setTitleAr] = useState('');
+    const [descriptionEn, setDescriptionEn] = useState('');
+    const [descriptionAr, setDescriptionAr] = useState('');
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
     const [image, setImage] = useState(null);
@@ -43,8 +46,22 @@ const CreateArticle = () => {
         setErrors({});
         setSubmitting(true);
         const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
+        // manual validation for both languages
+        const clientErrors = {};
+        if (!titleEn?.trim()) clientErrors.title_en = 'English title is required';
+        if (!titleAr?.trim()) clientErrors.title_ar = 'Arabic title is required';
+        if (!descriptionEn?.trim()) clientErrors.description_en = 'English description is required';
+        if (!descriptionAr?.trim()) clientErrors.description_ar = 'Arabic description is required';
+        if (!image) clientErrors.image = 'Image is required';
+        if (Object.keys(clientErrors).length) {
+            setErrors(clientErrors);
+            setSubmitting(false);
+            return;
+        }
+        formData.append('title_en', titleEn);
+        formData.append('title_ar', titleAr);
+        formData.append('description_en', descriptionEn);
+        formData.append('description_ar', descriptionAr);
         tags.forEach((tag, index) => {
             formData.append(`tags[${index}]`, tag);
         });
@@ -66,7 +83,16 @@ const CreateArticle = () => {
             <Head title="Create Article" />
 
             <div className="px-5 py-8">
-                <h1 className="text-3xl font-bold mb-6 text-alpha">Create New Article</h1>
+                <div className="max-w-4xl mx-auto bg-white text-black border border-gray-200 rounded-lg shadow p-6">
+                <h1 className="text-2xl font-semibold mb-6">Create An Article:</h1>
+
+                {/* Language Toggle */}
+                <div className="w-full bg-gray-100 rounded border border-gray-200 mb-4">
+                    <div className="grid grid-cols-2">
+                        <button type="button" onClick={() => setActiveLang('en')} className={`py-2 font-semibold ${activeLang === 'en' ? 'bg-white text-black rounded-l' : 'text-gray-600'}`}>English</button>
+                        <button type="button" onClick={() => setActiveLang('ar')} className={`py-2 font-semibold ${activeLang === 'ar' ? 'bg-white text-black rounded-r' : 'text-gray-600'}`}>العربية</button>
+                    </div>
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl" encType="multipart/form-data">
                     {/* Image Upload */}
@@ -91,30 +117,35 @@ const CreateArticle = () => {
                             </div>
                         )}
                     </div>
-                    {/* Title Field */}
-                    <div>
-                        <label className="block text-sm font-medium text-alpha mb-2">Title</label>
-                        <input
-                            type="text"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            placeholder="Enter article title"
-                            className="w-full rounded border border-gray-300 p-2 focus:border-blue-500 focus:ring-0"
-                            required
-                        />
-                        {errors.title && (
-                            <p className="text-red-600 text-sm mt-1">{errors.title}</p>
-                        )}
-                    </div>
+                    {/* Title Fields (toggle) */}
+                    {activeLang === 'en' ? (
+                        <div>
+                            <label className="block text-sm font-medium text-alpha mb-2">Article Title (English)</label>
+                            <input type="text" value={titleEn} onChange={(e) => setTitleEn(e.target.value)} placeholder="Enter English title" className="w-full rounded border border-gray-300 p-2 focus:border-blue-500 focus:ring-0" />
+                            {errors.title_en && (<p className="text-red-600 text-sm mt-1">{errors.title_en}</p>)}
+                        </div>
+                    ) : (
+                        <div>
+                            <label className="block text-sm font-medium text-alpha mb-2">عنوان المقال (العربية)</label>
+                            <input type="text" value={titleAr} onChange={(e) => setTitleAr(e.target.value)} placeholder="أدخل العنوان بالعربية" className="w-full rounded border border-gray-300 p-2 focus:border-blue-500 focus:ring-0" />
+                            {errors.title_ar && (<p className="text-red-600 text-sm mt-1">{errors.title_ar}</p>)}
+                        </div>
+                    )}
 
-                    {/* Description Editor */}
-                    <div>
-                        <label className="block text-sm font-medium text-alpha mb-2">Description</label>
-                        <TiptapEditor value={description} onChange={setDescription} />
-                        {errors.description && (
-                            <p className="text-red-600 text-sm mt-1">{errors.description}</p>
-                        )}
-                    </div>
+                    {/* Description Editor (toggle) */}
+                    {activeLang === 'en' ? (
+                        <div>
+                            <label className="block text-sm font-medium text-alpha mb-2">Article Description (English)</label>
+                            <TiptapEditor key="desc-en" value={descriptionEn} onChange={setDescriptionEn} />
+                            {errors.description_en && (<p className="text-red-600 text-sm mt-1">{errors.description_en}</p>)}
+                        </div>
+                    ) : (
+                        <div>
+                            <label className="block text-sm font-medium text-alpha mb-2">وصف المقال (العربية)</label>
+                            <TiptapEditor key="desc-ar" value={descriptionAr} onChange={setDescriptionAr} />
+                            {errors.description_ar && (<p className="text-red-600 text-sm mt-1">{errors.description_ar}</p>)}
+                        </div>
+                    )}
 
                     {/* Tags Input */}
                     <div>
@@ -163,16 +194,17 @@ const CreateArticle = () => {
                     </div>
 
                     {/* Submit Button */}
-                    <div>
+                    <div className="flex justify-center">
                         <button
                             type="submit"
                             disabled={submitting}
-                            className={`bg-alpha hover:bg-beta text-white font-medium px-5 py-2 rounded ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}
+                            className={`bg-alpha hover:bg-beta text-white font-medium px-6 py-2.5 rounded ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}
                         >
                             {submitting ? 'Saving...' : 'Save Article'}
                         </button>
                     </div>
                 </form>
+                </div>
             </div>
         </AppSidebarLayout>
     );

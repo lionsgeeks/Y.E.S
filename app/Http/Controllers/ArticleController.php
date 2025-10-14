@@ -32,8 +32,10 @@ class ArticleController extends Controller
     {
         // ✅ Validate all required fields
         $validated = $request->validate([
-            'title' => 'required|string',
-            'description' => 'required|string',
+            'title_en' => 'required|string',
+            'title_ar' => 'required|string',
+            'description_en' => 'required|string',
+            'description_ar' => 'required|string',
             'tags' => 'nullable|array',
             'tags.*' => 'string',
             'image' => 'required|file|image|max:20480',
@@ -49,8 +51,8 @@ class ArticleController extends Controller
         // ✅ Save the article (adjust model/DB fields as needed)
         // Cast string inputs to objects to match Article casts (title/description/tags as object)
         $article = Article::create([
-            'title' => [ 'en' => $validated['title'] ],
-            'description' => [ 'en' => $validated['description'] ],
+            'title' => [ 'en' => $validated['title_en'], 'ar' => $validated['title_ar'] ],
+            'description' => [ 'en' => $validated['description_en'], 'ar' => $validated['description_ar'] ],
             // store relative path in DB
             'image' => $imagePath,
             // store localized tags as arrays for en/ar
@@ -89,8 +91,10 @@ class ArticleController extends Controller
         $article = Article::findOrFail($id);
 
         $validated = $request->validate([
-            'title' => 'required|string',
-            'description' => 'required|string',
+            'title_en' => 'sometimes|string',
+            'title_ar' => 'sometimes|string',
+            'description_en' => 'sometimes|string',
+            'description_ar' => 'sometimes|string',
             'tags' => 'nullable|array',
             'tags.*' => 'string',
             'image' => 'nullable|file|image|max:20480',
@@ -101,13 +105,57 @@ class ArticleController extends Controller
             $imagePath = $request->file('image')->store('articles', 'public');
         }
 
+        // normalize access for array|object values from old records
+        $getFromMixed = function ($value, string $key, $default = '') {
+            if (is_array($value)) {
+                return $value[$key] ?? $default;
+            }
+            if (is_object($value)) {
+                return $value->{$key} ?? $default;
+            }
+            return $default;
+        };
+
+        $existingTitle = $article->title;
+        $existingDescription = $article->description;
+
+        $newTitle = [
+            'en' => $validated['title_en'] ?? $getFromMixed($existingTitle, 'en', ''),
+            'ar' => $validated['title_ar'] ?? $getFromMixed($existingTitle, 'ar', ''),
+        ];
+        $newDescription = [
+            'en' => $validated['description_en'] ?? $getFromMixed($existingDescription, 'en', ''),
+            'ar' => $validated['description_ar'] ?? $getFromMixed($existingDescription, 'ar', ''),
+        ];
+
+        // normalize existing tags from array|object|string
+        $normalizeTagsList = function ($val) {
+            if (is_array($val)) {
+                return array_values(array_filter(array_map('trim', $val), fn($v) => $v !== ''));
+            }
+            if (is_string($val)) {
+                // split by comma or arabic comma
+                $parts = preg_split('/[\,\x{060C}]/u', $val);
+                $parts = array_map('trim', $parts ?: []);
+                return array_values(array_filter($parts, fn($v) => $v !== ''));
+            }
+            return [];
+        };
+
+        $existingTags = $article->tags;
+        $existingTagsEn = $normalizeTagsList(is_object($existingTags) ? ($existingTags->en ?? []) : (is_array($existingTags) ? ($existingTags['en'] ?? []) : $existingTags));
+        $existingTagsAr = $normalizeTagsList(is_object($existingTags) ? ($existingTags->ar ?? []) : (is_array($existingTags) ? ($existingTags['ar'] ?? []) : $existingTags));
+
+        $newTagsEn = isset($validated['tags']) ? array_values($validated['tags']) : $existingTagsEn;
+        $newTagsAr = isset($validated['tags']) ? array_values($validated['tags']) : $existingTagsAr;
+
         $article->update([
-            'title' => [ 'en' => $validated['title'] ],
-            'description' => [ 'en' => $validated['description'] ],
+            'title' => $newTitle,
+            'description' => $newDescription,
             'image' => $imagePath,
             'tags' => [
-                'en' => isset($validated['tags']) ? array_values($validated['tags']) : (is_array($article->tags) ? ($article->tags['en'] ?? []) : []),
-                'ar' => isset($validated['tags']) ? array_values($validated['tags']) : (is_array($article->tags) ? ($article->tags['ar'] ?? []) : []),
+                'en' => $newTagsEn,
+                'ar' => $newTagsAr,
             ],
         ]);
 

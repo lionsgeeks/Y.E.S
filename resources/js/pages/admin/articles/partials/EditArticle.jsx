@@ -9,8 +9,11 @@ const EditArticle = ({ article }) => {
         { title: 'Edit Article', href: '/articles/edit/'+article.id },
     ];
 
-    const [title, setTitle] = useState(article?.title?.en || '');
-    const [description, setDescription] = useState(article?.description?.en || '');
+    const [activeLang, setActiveLang] = useState('en');
+    const [titleEn, setTitleEn] = useState(article?.title?.en || '');
+    const [titleAr, setTitleAr] = useState(article?.title?.ar || '');
+    const [descriptionEn, setDescriptionEn] = useState(article?.description?.en || '');
+    const [descriptionAr, setDescriptionAr] = useState(article?.description?.ar || '');
     const initialTags = useMemo(() => {
         const t = article?.tags?.en;
         if (Array.isArray(t)) return t;
@@ -20,7 +23,12 @@ const EditArticle = ({ article }) => {
     const [tags, setTags] = useState(initialTags);
     const [tagInput, setTagInput] = useState('');
     const [image, setImage] = useState(null);
-    const [preview, setPreview] = useState(article?.image || '');
+    const initialPreview = useMemo(() => {
+        const value = article?.image;
+        if (!value) return '';
+        return /^https?:\/\//i.test(value) ? value : `/storage/${String(value).replace(/^\/?storage\//, '')}`;
+    }, [article]);
+    const [preview, setPreview] = useState(initialPreview);
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -48,8 +56,10 @@ const EditArticle = ({ article }) => {
         setErrors({});
         setSubmitting(true);
         const formData = new FormData();
-        formData.append('title', title);
-        formData.append('description', description);
+        if (titleEn) formData.append('title_en', titleEn);
+        if (titleAr) formData.append('title_ar', titleAr);
+        if (descriptionEn) formData.append('description_en', descriptionEn);
+        if (descriptionAr) formData.append('description_ar', descriptionAr);
         tags.forEach((tag, index) => formData.append(`tags[${index}]`, tag));
         if (image) formData.append('image', image);
 
@@ -64,7 +74,16 @@ const EditArticle = ({ article }) => {
         <AppSidebarLayout breadcrumbs={breadcrumbs}>
             <Head title="Edit Article" />
             <div className='px-5 py-8'>
-                <h1 className="text-3xl font-bold mb-6 text-alpha">Edit Article</h1>
+                <div className="max-w-4xl mx-auto bg-white text-black border border-gray-200 rounded-lg shadow p-6">
+                <h1 className="text-2xl font-semibold mb-6">Create An Article:</h1>
+                {/* Language Toggle */}
+                <div className="w-full bg-gray-100 rounded border border-gray-200 mb-4">
+                    <div className="grid grid-cols-2">
+                        <button type="button" onClick={() => setActiveLang('en')} className={`py-2 font-semibold ${activeLang === 'en' ? 'bg-white text-alpha rounded-l' : 'text-gray-600'}`}>English</button>
+                        <button type="button" onClick={() => setActiveLang('ar')} className={`py-2 font-semibold ${activeLang === 'ar' ? 'bg-white text-alpha rounded-r' : 'text-gray-600'}`}>العربية</button>
+                    </div>
+                </div>
+
                 <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl" encType="multipart/form-data">
                     <div>
                         <label className="block text-sm font-medium text-alpha mb-2">Featured Image</label>
@@ -76,16 +95,32 @@ const EditArticle = ({ article }) => {
                             </div>
                         )}
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-alpha mb-2">Title</label>
-                        <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Enter article title" className="w-full rounded border border-gray-300 p-2 focus:border-beta focus:ring-0" required />
-                        {errors.title && (<p className="text-red-600 text-sm mt-1">{errors.title}</p>)}
-                    </div>
-                    <div>
-                        <label className="block text-sm font-medium text-alpha mb-2">Description</label>
-                        <TiptapEditor value={description} onChange={setDescription} />
-                        {errors.description && (<p className="text-red-600 text-sm mt-1">{errors.description}</p>)}
-                    </div>
+                    {activeLang === 'en' ? (
+                        <div>
+                            <label className="block text-sm font-medium text-alpha mb-2">Article Title (English)</label>
+                            <input type="text" value={titleEn} onChange={(e) => setTitleEn(e.target.value)} placeholder="Enter English title" className="w-full rounded border border-gray-300 p-2 focus:border-beta focus:ring-0" />
+                            {errors.title_en && (<p className="text-red-600 text-sm mt-1">{errors.title_en}</p>)}
+                        </div>
+                    ) : (
+                        <div>
+                            <label className="block text-sm font-medium text-alpha mb-2">عنوان المقال (العربية)</label>
+                            <input type="text" value={titleAr} onChange={(e) => setTitleAr(e.target.value)} placeholder="أدخل العنوان بالعربية" className="w-full rounded border border-gray-300 p-2 focus:border-beta focus:ring-0" />
+                            {errors.title_ar && (<p className="text-red-600 text-sm mt-1">{errors.title_ar}</p>)}
+                        </div>
+                    )}
+                    {activeLang === 'en' ? (
+                        <div>
+                            <label className="block text-sm font-medium text-alpha mb-2">Article Description (English)</label>
+                            <TiptapEditor key={`desc-en-${article.id}`} value={descriptionEn} onChange={setDescriptionEn} />
+                            {errors.description_en && (<p className="text-red-600 text-sm mt-1">{errors.description_en}</p>)}
+                        </div>
+                    ) : (
+                        <div>
+                            <label className="block text-sm font-medium text-alpha mb-2">وصف المقال (العربية)</label>
+                            <TiptapEditor key={`desc-ar-${article.id}`} value={descriptionAr} onChange={setDescriptionAr} />
+                            {errors.description_ar && (<p className="text-red-600 text-sm mt-1">{errors.description_ar}</p>)}
+                        </div>
+                    )}
                     <div>
                         <label className="block text-sm font-medium text-alpha mb-2">Tags</label>
                         <div className="flex flex-wrap items-center gap-2 border border-gray-300 p-2 rounded">
@@ -103,12 +138,13 @@ const EditArticle = ({ article }) => {
                         </div>
                         {errors.tags && (<p className="text-red-600 text-sm mt-1">{errors.tags}</p>)}
                     </div>
-                    <div>
-                        <button type="submit" disabled={submitting} className={`bg-alpha hover:bg-beta text-white font-medium px-5 py-2 rounded ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}>
+                    <div className="flex justify-center">
+                        <button type="submit" disabled={submitting} className={`bg-alpha hover:bg-beta text-white font-medium px-6 py-2.5 rounded ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}>
                             {submitting ? 'Saving...' : 'Update Article'}
                         </button>
                     </div>
                 </form>
+                </div>
             </div>
         </AppSidebarLayout>
     );
