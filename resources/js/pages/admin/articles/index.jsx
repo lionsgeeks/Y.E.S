@@ -105,6 +105,7 @@ const Articles = ({ articles }) => {
                         </Card>
                     ))}
                 </div>
+
             </div>
 
             {/* 🧱 Delete Confirmation Dialog */}

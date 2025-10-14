@@ -9,7 +9,7 @@
 
 @theme {
     --font-sans:
-        'Instrument Sans', ui-sans-serif, system-ui, sans-serif,
+        'Poppins', ui-sans-serif, system-ui, sans-serif,
         'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol',
         'Noto Color Emoji';
 
@@ -94,19 +94,22 @@
     --chart-4: oklch(0.828 0.189 84.429);
     --chart-5: oklch(0.769 0.188 70.08);
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.87 0 0);
+    /* YES Brand: primary blue + golden accent */
+    --alpha: #2e539d; /* primary brand blue */
+    --beta: #b09417; /* golden accent */
+    --gamma: #f8a205; /* secondary accent */
+
+    /* Sidebar uses brand colors */
+    --sidebar: var(--alpha);
+    --sidebar-foreground: #ffffff;
+    --sidebar-primary: var(--beta);
+    --sidebar-primary-foreground: #0b1325;
+    --sidebar-accent: color-mix(in oklab, var(--alpha) 85%, white);
+    --sidebar-accent-foreground: #0b1325;
+    --sidebar-border: color-mix(in oklab, var(--alpha) 80%, white 20%);
+    --sidebar-ring: color-mix(in oklab, var(--alpha) 60%, white 40%);
 
     /* Custom brand values */
-    --alpha: #2e539d;
-    --beta: #b09417;
-    --gamma: #f8a205;
     --muted-background: hsl(40,33%,95.9%);
     --muted-foreground: hsl(38,0.75%,45%);
 }
@@ -136,19 +139,16 @@
     --chart-3: oklch(0.769 0.188 70.08);
     --chart-4: oklch(0.627 0.265 303.9);
     --chart-5: oklch(0.645 0.246 16.439);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.985 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
-    --sidebar-border: oklch(0.269 0 0);
-    --sidebar-ring: oklch(0.439 0 0);
+    --sidebar: var(--alpha);
+    --sidebar-foreground: #ffffff;
+    --sidebar-primary: var(--beta);
+    --sidebar-primary-foreground: #0b1325;
+    --sidebar-accent: color-mix(in oklab, var(--alpha) 85%, white);
+    --sidebar-accent-foreground: #0b1325;
+    --sidebar-border: color-mix(in oklab, var(--alpha) 80%, white 20%);
+    --sidebar-ring: color-mix(in oklab, var(--alpha) 60%, white 40%);
 
     /* Custom brand values (dark mode - same as base unless specified) */
-    --alpha: #2e539d;
-    --beta: #b09417;
-    --gamma: #f8a205;
     --muted-background: hsl(40,33%,95.9%);
     --muted-foreground: hsl(38,0.75%,45%);
 }
@@ -190,14 +190,14 @@
     --chart-3: oklch(0.769 0.188 70.08) !important;
     --chart-4: oklch(0.627 0.265 303.9) !important;
     --chart-5: oklch(0.645 0.246 16.439) !important;
-    --sidebar: oklch(0.96 0 0) !important;
-    --sidebar-foreground: oklch(0.205 0 0) !important;
-    --sidebar-primary: oklch(0.205 0 0) !important;
-    --sidebar-primary-foreground: oklch(1 0 0) !important;
-    --sidebar-accent: oklch(0.96 0 0) !important;
-    --sidebar-accent-foreground: oklch(0.205 0 0) !important;
-    --sidebar-border: oklch(0.89 0 0) !important;
-    --sidebar-ring: oklch(0.455 0 0) !important;
+    --sidebar: var(--alpha) !important;
+    --sidebar-foreground: #ffffff !important;
+    --sidebar-primary: var(--beta) !important;
+    --sidebar-primary-foreground: #0b1325 !important;
+    --sidebar-accent: color-mix(in oklab, var(--alpha) 85%, white) !important;
+    --sidebar-accent-foreground: #0b1325 !important;
+    --sidebar-border: color-mix(in oklab, var(--alpha) 80%, white 20%) !important;
+    --sidebar-ring: color-mix(in oklab, var(--alpha) 60%, white 40%) !important;
 
     /* Custom brand values (force light mode) */
     --alpha: #2e539d !important;
@@ -215,17 +215,15 @@ html, body {
 
 
 
-@font-face {
-  font-family: "made_tomy";
-  src: url("../../public/assets/fonts/ TOMMY\ Regular_PERSONAL\ USE.otf");
-}
+/* Poppins font */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
 .swiper-button-next,
 .swiper-button-prev {
-  color: #2e539d;
+  color: var(--alpha);
 }
 
 body {
-  font-family: "made_tomy";
+  font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 /* To Reset Tailwind Classes in a div and it's children */
 .reset-tw,
@@ -236,7 +234,7 @@ body {
 input[type="checkbox"] {
   width: 15px;
   height: 15px;
-  accent-color: #2e539d;
+  accent-color: var(--alpha);
 }
 
 @keyframes ellipsis {

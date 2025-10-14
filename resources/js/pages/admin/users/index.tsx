@@ -1,22 +1,35 @@
 import { Head, Link, router } from '@inertiajs/react';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
-import { Plus, Edit, Trash2, Mail, User, Shield, Calendar } from 'lucide-react';
+import { Plus, Edit, Trash2, Mail, User, Shield, Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
 
-export default function UsersIndex({ users }) {
+type User = { id: number; name: string; email: string; email_verified_at?: string | null; created_at: string };
+
+export default function UsersIndex({ users }: { users: User[] }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
     });
 
-    const handleSubmit = (e) => {
+    const itemsPerPage = 10;
+    const totalPages = Math.ceil(users.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentUsers = useMemo(() => users.slice(startIndex, endIndex), [users, startIndex, endIndex]);
+
+    const goToPage = (page: number) => {
+        setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    };
+
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         router.post('/admin/users', formData, {
             onSuccess: () => {
@@ -110,7 +123,7 @@ export default function UsersIndex({ users }) {
                 </div>
 
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {users.map((user) => (
+                    {currentUsers.map((user) => (
                         <Card key={user.id} className="hover:shadow-lg transition-shadow">
                             <CardHeader>
                                 <div className="flex items-center justify-between">
@@ -161,6 +174,7 @@ export default function UsersIndex({ users }) {
                     ))}
                 </div>
 
+
                 {users.length === 0 && (
                     <Card className="text-center py-12">
                         <CardContent>
@@ -176,6 +190,39 @@ export default function UsersIndex({ users }) {
                             </Button>
                         </CardContent>
                     </Card>
+                )}
+
+                {users.length > 0 && totalPages > 1 && (
+                    <div className="flex items-center justify-between pt-8">
+                        <div className="text-sm text-gray-600">
+                            Showing {startIndex + 1} to {Math.min(endIndex, users.length)} of {users.length} users
+                        </div>
+                        <div className="flex items-center space-x-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => goToPage(currentPage - 1)}
+                                disabled={currentPage === 1}
+                                className="flex items-center"
+                            >
+                                <ChevronLeft className="w-4 h-4 mr-1" />
+                                Previous
+                            </Button>
+                            <span className="text-sm text-gray-600">
+                                Page {currentPage} of {totalPages}
+                            </span>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={() => goToPage(currentPage + 1)}
+                                disabled={currentPage === totalPages}
+                                className="flex items-center"
+                            >
+                                Next
+                                <ChevronRight className="w-4 h-4 ml-1" />
+                            </Button>
+                        </div>
+                    </div>
                 )}
             </div>
         </AppSidebarLayout>
