@@ -66,12 +66,12 @@ const CreateArticle = () => {
             <Head title="Create Article" />
 
             <div className="px-5 py-8">
-                <h1 className="text-3xl font-bold mb-6">Create New Article</h1>
+                <h1 className="text-3xl font-bold mb-6 text-alpha">Create New Article</h1>
 
                 <form onSubmit={handleSubmit} className="space-y-6 max-w-3xl" encType="multipart/form-data">
                     {/* Image Upload */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image</label>
+                        <label className="block text-sm font-medium text-alpha mb-2">Featured Image</label>
                         <input
                             type="file"
                             accept="image/*"
@@ -93,7 +93,7 @@ const CreateArticle = () => {
                     </div>
                     {/* Title Field */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+                        <label className="block text-sm font-medium text-alpha mb-2">Title</label>
                         <input
                             type="text"
                             value={title}
@@ -109,7 +109,7 @@ const CreateArticle = () => {
 
                     {/* Description Editor */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+                        <label className="block text-sm font-medium text-alpha mb-2">Description</label>
                         <TiptapEditor value={description} onChange={setDescription} />
                         {errors.description && (
                             <p className="text-red-600 text-sm mt-1">{errors.description}</p>
@@ -118,7 +118,7 @@ const CreateArticle = () => {
 
                     {/* Tags Input */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Tags</label>
+                        <label className="block text-sm font-medium text-alpha mb-2">Tags</label>
                         <div className="flex flex-wrap items-center gap-2 border border-gray-300 p-2 rounded">
                             {tags.map((tag, index) => (
                                 <div
@@ -167,7 +167,7 @@ const CreateArticle = () => {
                         <button
                             type="submit"
                             disabled={submitting}
-                            className={`bg-[#2e539d] hover:bg-[#1e3d7a] text-white font-medium px-5 py-2 rounded ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}
+                            className={`bg-alpha hover:bg-beta text-white font-medium px-5 py-2 rounded ${submitting ? 'opacity-60 cursor-not-allowed' : ''}`}
                         >
                             {submitting ? 'Saving...' : 'Save Article'}
                         </button>

@@ -86,7 +86,32 @@ class ArticleController extends Controller
     }
     public function update(Request $request, string $id)
     {
-        //
+        $article = Article::findOrFail($id);
+
+        $validated = $request->validate([
+            'title' => 'required|string',
+            'description' => 'required|string',
+            'tags' => 'nullable|array',
+            'tags.*' => 'string',
+            'image' => 'nullable|file|image|max:20480',
+        ]);
+
+        $imagePath = $article->image; // keep existing relative path
+        if ($request->hasFile('image')) {
+            $imagePath = $request->file('image')->store('articles', 'public');
+        }
+
+        $article->update([
+            'title' => [ 'en' => $validated['title'] ],
+            'description' => [ 'en' => $validated['description'] ],
+            'image' => $imagePath,
+            'tags' => [
+                'en' => isset($validated['tags']) ? array_values($validated['tags']) : (is_array($article->tags) ? ($article->tags['en'] ?? []) : []),
+                'ar' => isset($validated['tags']) ? array_values($validated['tags']) : (is_array($article->tags) ? ($article->tags['ar'] ?? []) : []),
+            ],
+        ]);
+
+        return redirect()->route('admin.articles')->with('success', 'Article updated successfully!');
     }
 
     /**
