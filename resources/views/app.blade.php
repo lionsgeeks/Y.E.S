@@ -13,7 +13,7 @@
                 document.documentElement.classList.add('light');
                 document.documentElement.style.colorScheme = 'light';
                 document.documentElement.style.backgroundColor = 'oklch(1 0 0)';
-                
+
                 // Prevent any dark mode detection
                 if (window.matchMedia) {
                     window.matchMedia('(prefers-color-scheme: dark)').removeEventListener('change', function() {});
@@ -32,7 +32,7 @@
             html.dark {
                 background-color: oklch(1 0 0) !important;
             }
-            
+
             /* Force light theme variables */
             :root {
                 --background: oklch(1 0 0) !important;
@@ -40,11 +40,11 @@
             }
         </style>
 
-        <title inertia>{{ config('app.name', 'Laravel') }}</title>
+        <title inertia>{{ config('app.name', 'Yes Africa') }}</title>
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="icon" href="/logo.svg" sizes="any">
+        <link rel="icon" href="/logo.svg" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/logo.svg">
 
         <link rel="preconnect" href="https://fonts.bunny.net">
         <link href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600" rel="stylesheet" />
