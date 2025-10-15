@@ -7,6 +7,7 @@ use App\Http\Controllers\SponsorController;
 use App\Http\Controllers\ScientificCommitteeController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\MesageController;
+use App\Http\Controllers\PlaidoyerController;
 use App\Models\Sponsor;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Route;
@@ -86,6 +87,12 @@ Route::get('/sponsors', [SponsorController::class, 'index'])->name('sponsors.ind
 
 
 Route::post('/messages', [MesageController::class, 'store']);
+
+// Plaidoyer – Formulaire de Recommandation
+Route::get('/plaidoyer', function () {
+    return Inertia::render('client/plaidoyer/index');
+})->name('plaidoyer');
+Route::post('/plaidoyer', [PlaidoyerController::class, 'store'])->name('plaidoyer.store');
 
 // Map API routes live in routes/api.php (stateless)
 
