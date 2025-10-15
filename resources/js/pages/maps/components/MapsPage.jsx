@@ -135,15 +135,26 @@ export default function MapsPage() {
     }, []);
 
     const handleSubmit = async (e, type, payload) => {
-        e.preventDefault();
+        e && e.preventDefault && e.preventDefault();
+        if (storeUseForm.processing) return; // prevent double submit
         if (!newPosition?.lat || !newPosition?.lng) return;
         storeUseForm.setData({ type, payload, lat: newPosition.lat, lng: newPosition.lng });
         setLoading(true);
-        if (storeUseForm.processing) return; // prevent double submit
         storeUseForm.post('/maps', {
             preserveScroll: true,
+            preserveState: true,
             forceFormData: true,
-            onSuccess: () => { 
+            onSuccess: () => {
+                // Reset all form inputs after successful submit
+                setOrgForm({});
+                setBailleurForm({});
+                setEntrepriseForm({});
+                setAgenceForm({});
+                setPubliqueForm({});
+                setAcademiqueForm({});
+                storeUseForm.reset();
+                setSelectedForm("");
+                setNewPosition(null);
                 // Close all modals and show the success overlay on top
                 setShowModal(false);
                 setShowOrgModal(false);
@@ -245,6 +256,7 @@ export default function MapsPage() {
                     setLoading(true);
                     regUseForm.post('/maps/register', {
                         preserveScroll: true,
+                        preserveState: true,
                         onSuccess: () => { setError(''); setStep(2); },
                         onError: () => setError('Failed to send code'),
                         onFinish: () => setLoading(false),
@@ -258,7 +270,8 @@ export default function MapsPage() {
                     setLoading(true);
                     regUseForm.post('/maps/verify', {
                         preserveScroll: true,
-                        onSuccess: () => { setError(''); setStep(3); },
+                        preserveState: true,
+                        onSuccess: () => { setError(''); setStep(3); setRegForm((p)=>({ ...p, code: '' })); },
                         onError: () => setError('Invalid or expired code'),
                         onFinish: () => setLoading(false),
                     });

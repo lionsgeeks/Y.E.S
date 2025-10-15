@@ -13,7 +13,7 @@ use Illuminate\Database\Schema\Blueprint;
 
 class MapController extends Controller
 {
-    
+
     public function index()
     {
         $shows = Show::with('showable')->where('approve', true)->get()->groupBy('showable_type');
@@ -73,7 +73,7 @@ class MapController extends Controller
             $saveLogo = function($file) {
                 if (!$file) return null;
                 $name = preg_replace('/[^A-Za-z0-9._-]/', '_', $file->getClientOriginalName());
-                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('logos', $file, $name);
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('images/logos', $file, $name);
                 return 'logos/' . $name;
             };
 

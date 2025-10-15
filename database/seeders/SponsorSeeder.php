@@ -115,7 +115,7 @@ class SponsorSeeder extends Seeder
                     'type' => $data['type'],
                     'website_url' => $data['website_url'] ?? null,
                     'description' => $data['description'] ?? null,
-                    'path' => $data['path'] ?? '',
+                    'path' => "sponsors/" . $data['path'] ?? '',
                 ]
             );
         }

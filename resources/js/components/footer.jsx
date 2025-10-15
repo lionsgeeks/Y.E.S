@@ -30,6 +30,11 @@ const LinkedinIcon = () => (
     <path d="M4.98 3.5C4.98 4.88 3.86 6 2.5 6S0 4.88 0 3.5 1.12 1 2.5 1s2.48 1.12 2.48 2.5ZM.5 8.5h4V23h-4V8.5Zm7 0h3.84v1.98h.05c.53-.99 1.82-2.04 3.75-2.04 4.01 0 4.75 2.64 4.75 6.07V23h-4v-6.43c0-1.53-.03-3.49-2.13-3.49-2.13 0-2.46 1.66-2.46 3.38V23h-4V8.5Z" />
   </svg>
 );
+const YoutubeIcon = () => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className="h-6 w-6">
+    <path d="M23.5 6.2s-.2-1.6-.8-2.3c-.8-.9-1.7-.9-2.1-1C17.7 2.5 12 2.5 12 2.5h0s-5.7 0-8.6.4c-.4.1-1.3.1-2.1 1C.7 4.6.5 6.2.5 6.2S0 8.1 0 10v3.9c0 1.9.5 3.8.5 3.8s.2 1.6.8 2.3c.8.9 1.9.9 2.4 1 1.8.2 8.3.4 8.3.4s5.7 0 8.6-.4c.4-.1 1.3-.1 2.1-1 .6-.7.8-2.3.8-2.3s.5-1.9.5-3.8V10c0-1.9-.5-3.8-.5-3.8ZM9.75 14.9V8.7l6.25 3.1-6.25 3.1Z" />
+  </svg>
+);
 
 const Footer = () => {
   return (
@@ -57,6 +62,9 @@ const Footer = () => {
                   </a>
                   <a target="blank" href="https://www.linkedin.com/company/yes-summit-africa" className="text-gray-400 hover:text-[#0a66c2] transition duration-200">
                     <IconWrapper><LinkedinIcon /></IconWrapper>
+                  </a>
+                  <a target="blank" href="https://www.youtube.com/@Y.E.SAfrica" className="text-gray-400 hover:text-[#0a66c2] transition duration-200">
+                    <IconWrapper><YoutubeIcon /></IconWrapper>
                   </a>
                 </div>
               </div>

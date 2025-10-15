@@ -54,7 +54,7 @@ const EventInfo = () => {
       },
       programBtn: {
         en: "Download Program",
-        ar: "تحميل البرنامج", 
+        ar: "تحميل البرنامج",
         fr: "Télécharger le programme",
       },
       contactBtn: {
@@ -118,17 +118,17 @@ const EventInfo = () => {
                 selectedLanguage === "ar" && "flex-row-reverse"
               }`}
             >
-              <Link target="_blank" to={"https://www.registration.yesafrica.eventlink.ma/inscription/yes-africa3ZlSqN8"}>
+              {/* <Link target="_blank" to={"https://www.registration.yesafrica.eventlink.ma/inscription/yes-africa3ZlSqN8"}>
                 <button className="bg-alpha border-2 lg:text-lg text-white border-alpha hover:border-white hover:bg-white hover:text-alpha px-8 py-2.5 w-fit rounded-lg lg:font-medium">
                   <TransText {...aboutBtn} />
                 </button>
-              </Link>
-              <a download={true} href={""}>
+              </Link> */}
+              {/* <a download={true} href={""}>
                 <button className="bg-alpha border-2 lg:text-lg flex items-center text-white border-alpha hover:border-white hover:bg-white hover:text-alpha px-8 py-2.5 w-fit rounded-lg lg:font-medium">
                   <Download size={20} className="inline-block mr-2" />
                   <TransText {...programBtn} />
                 </button>
-              </a>
+              </a> */}
 
               <Link to={"/contact"}>
                 <button className="bg-transparent border-2 lg:text-lg text-white border-white  hover:border-alpha hover:text-alpha px-8 py-2.5 w-fit rounded-lg font-medium transition-[background-color] duration-[700ms]">
@@ -143,7 +143,7 @@ const EventInfo = () => {
             selectedLanguage === "ar" ? "items-end" : "items-start"
           }`}
         >
-          {eventInformation.map(({ icon, text }, index) => (
+          {/* {eventInformation.map(({ icon, text }, index) => (
             <div
               key={index}
               className={`flex items-center gap-2 ${
@@ -155,10 +155,10 @@ const EventInfo = () => {
                 <TransText {...text} />
               </p>
             </div>
-          ))}
-          <div>
+          ))} */}
+          {/* <div>
             <Countdown targetDate="2025-06-19T00:09:00" />
-          </div>
+          </div> */}
         </div>
       </div>
       <FacesCarousel
@@ -168,17 +168,32 @@ const EventInfo = () => {
               "Meet The faces behind YES SUMMIT Episode 1 – Mr. Hamid BEN ELAFDIL, President of Jadara Foundation",
             id: "gTNrjHGoWmQ",
           },
-          {
-            title:
-              "Meet the Faces behin YES Africa Summit : Mahdi Bouziane, Executif Director of LionsGEEK",
-            id: "0mg3CiRvgIQ",
-          },
+        //   {
+        //     title:
+        //       "Meet the Faces behin YES Africa Summit : Mahdi Bouziane, Executif Director of LionsGEEK",
+        //     id: "0mg3CiRvgIQ",
+        //   },
           {
             title:
               "MEET THE FACES BEHIND Y.E.S EP3 : M.BA BOCAR ABDOULAYE",
             id: "re_q6h-K7ac?si=CQTan1x_nb74aMS4",
           },
-      
+          {
+            title:
+              "🎥☕ AFRICA CAFÉ: WHERE STORIES, CULTURE & CONNECTION BREWED",
+            id: "R8Yo5Th2YEI?si=jMFITIvnLosrbo_c",
+          },
+          {
+            title:
+              "Thematic Conferences  10 Simultaneous Sessions🌐10 Pathways to Youth Empowerment —",
+            id: "8SK-BnNcV_c?si=Vrgp0GPEYtrHIWpd",
+          },
+          {
+            title:
+              "Monaco at the Yes Africa Marketplace",
+            id: "eHErBDsMabQ?si=HaNlzTJSTUadDf_F",
+          },
+
         ]}
       />
     </section>
