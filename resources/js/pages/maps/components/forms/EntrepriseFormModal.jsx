@@ -62,13 +62,7 @@ const EntrepriseFormModal = ({ open, formData, setFormData, onSubmit, onClose, l
                         </div>
                         <div className="space-y-2">
                             <label className="block text-sm font-semibold text-gray-700"><TransText en="Phone" ar="الهاتف" fr="Téléphone" /></label>
-                            <div className="flex">
-                                <select value={formData.telephone_code||''} onChange={(e)=>setFormData({...formData, telephone_code:e.target.value})} className="w-[5rem] p-2 border rounded-l-md border-gray-300 bg-white">
-                                    <option value=""><TransText en="+Code" ar="+الرمز" fr="+Indicatif" /></option>
-                                    {indicatif?.sort((a,b)=>a.dial_code.localeCompare(b.dial_code)).map((item)=> (<option key={item.id} value={item.dial_code}>{item.dial_code}</option>))}
-                                </select>
-                                <input type="tel" value={formData.telephone_number||''} onChange={(e)=>setFormData({...formData, telephone_number:e.target.value})} className="w-full p-2 border border-l-0 rounded-r-md border-gray-300" placeholder="Numéro" />
-                            </div>
+                            <input type="tel" value={formData.telephone||''} onChange={(e)=>setFormData({...formData, telephone:e.target.value})} className="w-full p-2 border rounded-md" placeholder="+213555000000" />
                         </div>
                         <div className="space-y-2">
                             <label className="block text-sm font-semibold text-gray-700"><TransText en="Social Media" ar="وسائل التواصل الاجتماعي" fr="Réseaux sociaux" /></label>
@@ -137,6 +131,10 @@ const EntrepriseFormModal = ({ open, formData, setFormData, onSubmit, onClose, l
                             }} className="w-full p-2 border rounded h-32">
                                 {data.map((item)=> (<option key={item.id} value={item.value}>{item.name}</option>))}
                             </select>
+                        </div>
+                        <div className="space-y-2 md:col-span-3">
+                            <label className="block text-sm font-semibold text-gray-700"><TransText en="Sought Profiles" ar="الملفات المطلوبة" fr="Profils recherchés" /></label>
+                            <textarea rows="3" className="w-full p-2 border rounded" value={formData.profils_recherches||''} onChange={(e)=>setFormData({...formData, profils_recherches:e.target.value})}></textarea>
                         </div>
                         <div className="space-y-2 md:col-span-3">
                             <label className="block text-sm font-semibold text-gray-700"><TransText en="Integration Process" ar="عملية الإدماج" fr="Processus d'intégration" /></label>

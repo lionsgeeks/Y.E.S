@@ -64,15 +64,7 @@ const BailleurFormModal = ({ open, formData, setFormData, onSubmit, onClose, loa
                         </div>
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700"><TransText en="Phone" ar="الهاتف" fr="Téléphone" /></label>
-                            <div className="flex">
-                                <select value={formData.telephone_code||''} onChange={(e)=>setFormData({...formData, telephone_code:e.target.value})} className="w-[5rem] p-2 border rounded-l-md border-gray-300 bg-white">
-                                    <option value=""><TransText en="+Code" ar="+الرمز" fr="+Indicatif" /></option>
-                                    {indicatif?.sort((a,b)=>a.dial_code.localeCompare(b.dial_code)).map((item)=> (
-                                        <option key={item.id} value={item.dial_code}>{item.dial_code}</option>
-                                    ))}
-                                </select>
-                                <input type="tel" name="telephone_number" value={formData.telephone_number||''} onChange={(e)=>setFormData({...formData, telephone_number:e.target.value})} className="w-2/3 p-2 border border-l-0 rounded-r-md border-gray-300" placeholder="Numéro" />
-                            </div>
+                            <input type="tel" name="telephone" value={formData.telephone||''} onChange={(e)=>setFormData({...formData, telephone:e.target.value})} className="w-full p-2 border rounded-md" placeholder="+213555000000" />
                         </div>
                         <div className="space-y-2">
                             <label className="block text-sm font-medium text-gray-700"><TransText en="Responsible Contact" ar="جهة الاتصال المسؤولة" fr="Contact responsable" /></label>

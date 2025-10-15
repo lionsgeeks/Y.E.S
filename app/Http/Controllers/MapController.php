@@ -97,12 +97,18 @@ class MapController extends Controller
             // Clean transient UI fields
             unset($payload['telephone_code'], $payload['telephone_number'], $payload['phone_code'], $payload['phone_number']);
 
-            // Handle uploaded logo files and normalize to 'logos/{filename}'
+            // Handle uploaded files and normalize to target folders
             $saveLogo = function($file) {
                 if (!$file) return null;
                 $name = preg_replace('/[^A-Za-z0-9._-]/', '_', $file->getClientOriginalName());
                 \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('images/logos', $file, $name);
                 return 'logos/' . $name;
+            };
+            $saveFileTo = function($file, string $folder) {
+                if (!$file) return null;
+                $name = preg_replace('/[^A-Za-z0-9._-]/', '_', $file->getClientOriginalName());
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs($folder, $file, $name);
+                return rtrim($folder, '/') . '/' . $name;
             };
 
             $uploadedLogo = $request->file('payload.logo') ?? $request->file('logo') ?? null;
@@ -112,6 +118,11 @@ class MapController extends Controller
             $uploadedLogoPath = $request->file('payload.logo_path') ?? $request->file('logo_path') ?? null;
             if ($uploadedLogoPath) {
                 $payload['logo_path'] = $saveLogo($uploadedLogoPath);
+            }
+            // Additional file field used by some forms (e.g., agences)
+            $uploadedStrategicDoc = $request->file('payload.cadre_strategique') ?? $request->file('cadre_strategique') ?? null;
+            if ($uploadedStrategicDoc) {
+                $payload['cadre_strategique'] = $saveFileTo($uploadedStrategicDoc, 'documents');
             }
 
             // If logo fields are strings with absolute paths, collapse to basename under logos/
@@ -164,7 +175,24 @@ class MapController extends Controller
                     $jsonDefaults(['regions_afrique','reseaux_sociaux2','contact_rse','competences_pro_bono','regions_recrutement']);
                     break;
                 case 'agences':
-                    $jsonDefaults(['pays_representes','couverture_afrique','contact_jeunesse','programmes_phares','outils_methodologiques']);
+                    // Encode array-like fields coming from the UI so SQLite/text columns accept them
+                    $jsonDefaults([
+                        'pays_representes',
+                        'couverture_afrique',
+                        'contact_jeunesse',
+                        // The following are stored as CSV in UI; convert to arrays first
+                        'bureaux_afrique',
+                        'priorites_thematiques',
+                        'domaines_expertise',
+                        'type_partenaires',
+                    ]);
+                    // Convert CSV strings to arrays for specific varchar/TEXT columns, then JSON encode
+                    foreach (['programmes_phares','outils_methodologiques','opportunites_financement'] as $csvKey) {
+                        if (isset($payload[$csvKey]) && is_string($payload[$csvKey])) {
+                            $arr = array_filter(array_map('trim', explode(',', $payload[$csvKey])), fn($v)=>$v!=='');
+                            $payload[$csvKey] = json_encode($arr);
+                        }
+                    }
                     break;
                 case 'publiques':
                     $jsonDefaults(['youthContact','expectedResults']);

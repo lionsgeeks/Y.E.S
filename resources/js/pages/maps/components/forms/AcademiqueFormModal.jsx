@@ -92,7 +92,7 @@ const AcademiqueFormModal = ({ open, formData, setFormData, onSubmit, onClose, l
                         </div>
                         <div className="space-y-2">
                             <label className="block text-sm font-semibold text-gray-700"><TransText en="Publications" ar="المنشورات" fr="Publications" /></label>
-                            <input type="file" multiple onChange={(e)=>setFormData({...formData, publications:Array.from(e.target.files||[])})} className="w-full text-sm file:bg-blue-100 file:border-0 file:px-4 file:py-2 file:rounded-lg file:text-blue-800 hover:file:bg-blue-200" />
+                            <textarea rows="3" name="publications" value={formData.publications||''} onChange={(e)=>setFormData({...formData, publications:e.target.value})} className="w-full p-3 border rounded-lg" />
                         </div>
                         <div className="space-y-2">
                             <label className="block text-sm font-semibold text-gray-700"><TransText en="Training Programs" ar="برامج التدريب" fr="Programmes de formation" /></label>

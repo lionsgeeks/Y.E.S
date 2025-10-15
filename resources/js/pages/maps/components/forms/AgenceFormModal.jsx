@@ -75,6 +75,12 @@ const AgenceFormModal = ({ open, formData, setFormData, onSubmit, onClose, loadi
                             </select>
                         </div>
                         <div className="space-y-2 md:col-span-2">
+                            <label className="block text-sm font-semibold text-gray-700"><TransText en="Countries Represented" ar="الدول الممثلة" fr="Pays représentés" /></label>
+                            <select multiple name="pays_representes" value={formData.pays_representes||[]} onChange={(e)=>setFormData({...formData, pays_representes:Array.from(e.target.selectedOptions,(o)=>o.value)})} className="w-full p-2 border rounded-md h-32">
+                                {data.map((item)=> (<option key={item.id} value={item.value}>{item.name}</option>))}
+                            </select>
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
                             <label className="block text-sm font-semibold text-gray-700"><TransText en="Partner Types" ar="أنواع الشركاء" fr="Type de partenaires" /></label>
                             <select multiple value={formData.type_partenaires||[]} onChange={(e)=>setFormData({...formData, type_partenaires:Array.from(e.target.selectedOptions,(o)=>o.value)})} className="w-full p-3 border rounded-lg h-32">
                                 <option value="ONG">ONG</option>
@@ -85,6 +91,18 @@ const AgenceFormModal = ({ open, formData, setFormData, onSubmit, onClose, loadi
                         <div className="space-y-2">
                             <label className="block text-sm font-semibold text-gray-700"><TransText en="Collaboration Mechanisms" ar="آليات التعاون" fr="Mécanismes de collaboration" /></label>
                             <input type="text" value={formData.mecanismes_collaboration||''} onChange={(e)=>setFormData({...formData, mecanismes_collaboration:e.target.value})} className="w-full p-2 border rounded" />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="block text-sm font-semibold text-gray-700"><TransText en="Flagship Programs (comma-separated)" ar="البرامج الرئيسية" fr="Programmes phares (séparés par virgule)" /></label>
+                            <textarea rows="2" value={formData.programmes_phares||''} onChange={(e)=>setFormData({...formData, programmes_phares:e.target.value})} className="w-full p-3 border rounded-lg" />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-semibold text-gray-700"><TransText en="Methodological Tools (comma-separated)" ar="الأدوات المنهجية" fr="Outils méthodologiques (séparés par virgule)" /></label>
+                            <input type="text" value={formData.outils_methodologiques||''} onChange={(e)=>setFormData({...formData, outils_methodologiques:e.target.value})} className="w-full p-2 border rounded" />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="block text-sm font-semibold text-gray-700"><TransText en="Funding Opportunities (comma-separated)" ar="فرص التمويل" fr="Opportunités de financement (séparées par virgule)" /></label>
+                            <textarea rows="2" value={formData.opportunites_financement||''} onChange={(e)=>setFormData({...formData, opportunites_financement:e.target.value})} className="w-full p-3 border rounded-lg" />
                         </div>
                         <div className="space-y-2 md:col-span-2">
                             <label className="block text-sm font-semibold text-gray-700"><TransText en="Areas of Expertise" ar="مجالات الخبرة" fr="Domaines d'expertise" /></label>
