@@ -46,24 +46,35 @@ const Sponsors = ({ sponsors = [] }) => {
             {/* Sponsors carousel */}
             <div className="relative overflow-hidden rounded-3xl bg-white py-8 px-12 mt-8">
                 <style>{`
-          @keyframes scrollSponsors {
-            0% { transform: translateX(0); }
-            100% { transform: translateX(-50%); }
-          }
-        `}</style>
+                    @keyframes scrollSponsors {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); }
+                    }
+                `}</style>
 
                 <div
-                    className="flex items-center gap-20 w-max animate-[scrollSponsors_25s_linear_infinite]"
-                    onMouseEnter={(e) =>
-                        (e.currentTarget.style.animationPlayState = "paused")
-                    }
-                    onMouseLeave={(e) =>
-                        (e.currentTarget.style.animationPlayState = "running")
-                    }
+                    className="flex items-center gap-20 w-max animate-[scrollSponsors_20s_linear_infinite]"
+                    onMouseEnter={(e) => (e.currentTarget.style.animationPlayState = "paused")}
+                    onMouseLeave={(e) => (e.currentTarget.style.animationPlayState = "running")}
                 >
                     {processedSponsors.map((sponsor, idx) => (
                         <a
-                            key={`s-${idx}`}
+                            key={`s1-${idx}`}
+                            href={sponsor.url}
+                            className="w-[220px] flex items-center justify-center"
+                        >
+                            <img
+                                src={sponsor.src}
+                                alt="sponsor"
+                                className="h-16 md:h-28 w-auto object-contain opacity-90 hover:opacity-100 transition-opacity"
+                                loading="lazy"
+                            />
+                        </a>
+                    ))}
+
+                    {processedSponsors.map((sponsor, idx) => (
+                        <a
+                            key={`s2-${idx}`}
                             href={sponsor.url}
                             className="w-[220px] flex items-center justify-center"
                         >
@@ -77,6 +88,7 @@ const Sponsors = ({ sponsors = [] }) => {
                     ))}
                 </div>
             </div>
+
         </section>
     );
 };

@@ -38,15 +38,15 @@ const EventInfo = () => {
   const text = [
     {
       title: {
-        en: "Information About The Event",
-        ar: "معلومات عن الحدث",
-        fr: "Informations sur l'événement",
+        en: "Relive the Y.E.S Africa Summit in Marrakech",
+        ar: "أعد إحياء قمة Y.E.S Africa في مراكش",
+        fr: "Revivez le Sommet Y.E.S Africa à Marrakech",
       },
-      desc: {
-        en: "Join us for a vibrant celebration of African youth empowerment! Experience an exciting event featuring inspiring speakers, interactive workshops, and captivating live performances. This is a fantastic opportunity to connect with fellow change-makers, exchange ideas, and celebrate the dynamism of African youth. Don’t miss this enriching experience designed to uplift and inspire the next generation!",
-        ar: "انضموا إلينا للاحتفال النابض بتمكين الشباب الأفريقي! عيشوا تجربة مثيرة تتضمن متحدثين ملهمين، ورش عمل تفاعلية، وعروض حية ساحرة. هذه فرصة رائعة للتواصل مع صانعي التغيير الآخرين، وتبادل الأفكار، والاحتفال بحيوية الشباب الأفريقي. لا تفوتوا هذه التجربة الغنية المصممة لرفع معنويات وإلهام الجيل القادم!",
-        fr: "Rejoignez-nous pour une célébration vibrante de l'autonomisation des jeunes africains ! Vivez un événement passionnant avec des conférenciers inspirants, des ateliers interactifs et des performances en direct captivantes. C'est une occasion fantastique de se connecter avec d'autres acteurs du changement, d'échanger des idées et de célébrer le dynamisme des jeunes africains. Ne manquez pas cette expérience enrichissante conçue pour élever et inspirer la prochaine génération !",
-      },
+       desc: {
+      en: "The first edition of the Y.E.S Africa Summit, held in Marrakech on June 19 and 20, 2025, marked a decisive moment by mobilizing over 1000 participants for a pan-African consensus on youth empowerment. The event brought together an impressive coalition of stakeholders, including 54 Represented Governments, 10 UN and International Cooperation Agencies, and 57 Stakeholders, alongside 150 Non-Governmental Organizations. This synergy led to the adoption of a Manifesto of Commitments. Furthermore, a marketplace was established to directly connect project leaders with investors, creating concrete momentum. To ensure the continuity of these resolutions and amplify this continental impact, we must go further. Join us!",
+      ar: "انعقدت النسخة الأولى من قمة Y.E.S Africa في مراكش يومي 19 و20 يونيو 2025، بمشاركة أكثر من 1000 شخص من 54 حكومة و10 وكالات أممية و57 جهة و150 منظمة غير حكومية، واعتمدت بيان التزامات مشترك وسوقًا لربط أصحاب المشاريع بالمستثمرين والممولين، لتطلق دينامية حقيقية نحو تمكين الشباب الإفريقي وتعزيز الأثر القاري، فانضموا إلينا!",
+      fr: "La première édition du Sommet Y.E.S Africa, tenue à Marrakech les 19 et 20 juin 2025, a marqué un moment décisif en mobilisant plus de 1000 participants pour un consensus panafricain sur l'autonomisation des jeunes. L'événement a réuni une coalition impressionnante d'acteurs, incluant 54 Gouvernements Représentés, 10 Agences onusiennes et de Coopération Internationales, et 57 Parties Prenantes, aux côtés de 150 Organisations Non Gouvernementales. Cette synergie s'est concrétisée par l'adoption d'un Manifeste d'engagements. De plus, une place de marché a été mise en place afin de connecter directement les porteurs de projets à des bailleurs de fonds et investisseurs, lançant ainsi un élan concret. Pour garantir la continuité de ces résolutions et amplifier cet impact continental, nous devons aller plus loin. Rejoignez-nous !",
+    },
       aboutBtn: {
         en: "Register to Summit",
         ar: " تسجل في القمة",

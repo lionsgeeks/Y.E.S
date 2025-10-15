@@ -1,6 +1,6 @@
 import React from "react";
 
-const SearchBar = ({ searchTerm, onSearch, results, onPick, inputRef, onFocus, isOpen, storageBaseUrl }) => {
+const SearchBar = ({ searchTerm, onSearch, results, onPick, inputRef, onFocus, isOpen }) => {
     return (
         <div className="lg:w-[60%] right-[3%]  bg-white rounded">
             <input
@@ -22,7 +22,7 @@ const SearchBar = ({ searchTerm, onSearch, results, onPick, inputRef, onFocus, i
                         >
                             <div className="w-10 aspect-square object-cover bg-gray-100 rounded-full ">
                                 <img
-                                    src={storageBaseUrl + `/storage/${element?.showable?.logo || element?.showable?.logo_path}`}
+                                    src={`/storage/images/${element?.showable?.logo || element?.showable?.logo_path}`}
                                     className="w-full h-full object-cover rounded-full"
                                     alt="logo"
                                 />

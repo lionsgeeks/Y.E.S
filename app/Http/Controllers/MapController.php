@@ -69,6 +69,34 @@ class MapController extends Controller
 
             $payload = $data['payload'];
 
+            // Normalize phone fields that come split as code + number from various forms
+            $joinPhone = function($code, $number) {
+                $c = is_string($code) ? trim($code) : '';
+                $n = is_string($number) ? trim($number) : '';
+                if ($c === '' && $n === '') return null;
+                // Keep leading + in code, strip non digits otherwise
+                $c = preg_replace('/[^0-9+]/', '', $c);
+                $n = preg_replace('/[^0-9]/', '', $n);
+                return ($c ?: '') . $n;
+            };
+            $combinedPhone = $joinPhone($payload['telephone_code'] ?? ($payload['phone_code'] ?? null), $payload['telephone_number'] ?? ($payload['phone_number'] ?? null));
+            if ($combinedPhone) {
+                // Common flat field used by some tables (e.g., bailleurs)
+                $payload['telephone'] = $combinedPhone;
+                // Embed inside known JSON contact fields when present
+                if (isset($payload['contact_rse']) && is_array($payload['contact_rse'])) {
+                    $payload['contact_rse']['telephone'] = $combinedPhone;
+                }
+                if (isset($payload['contact_jeunesse']) && is_array($payload['contact_jeunesse'])) {
+                    $payload['contact_jeunesse']['telephone'] = $combinedPhone;
+                }
+                if (isset($payload['contact_responsable']) && is_array($payload['contact_responsable'])) {
+                    $payload['contact_responsable']['telephone'] = $combinedPhone;
+                }
+            }
+            // Clean transient UI fields
+            unset($payload['telephone_code'], $payload['telephone_number'], $payload['phone_code'], $payload['phone_number']);
+
             // Handle uploaded logo files and normalize to 'logos/{filename}'
             $saveLogo = function($file) {
                 if (!$file) return null;

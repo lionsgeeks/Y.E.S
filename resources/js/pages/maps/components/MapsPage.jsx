@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import mapboxgl from "mapbox-gl";
 import "mapbox-gl/dist/mapbox-gl.css";
 import axios from "axios";
-import { useForm } from "@inertiajs/react";
+import { useForm, router } from "@inertiajs/react";
 import Drawer from "@components/Drawer";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
@@ -137,7 +137,7 @@ export default function MapsPage() {
     const handleSubmit = async (e, type, payload) => {
         e && e.preventDefault && e.preventDefault();
         if (storeUseForm.processing) return; // prevent double submit
-        if (!newPosition?.lat || !newPosition?.lng) return;
+        if (newPosition?.lat == null || newPosition?.lng == null) return;
         storeUseForm.setData({ type, payload, lat: newPosition.lat, lng: newPosition.lng });
         setLoading(true);
         storeUseForm.post('/maps', {
@@ -206,7 +206,7 @@ export default function MapsPage() {
                 const el = document.createElement("div"); el.className = "custom-marker";
                 const img = document.createElement("img");
                 const logoPath = marker.showable.logo || marker.showable.logo_path;
-                img.src = logoPath ? `${storageBaseUrl}/storage/${logoPath}` : "/default_logo.png";
+                img.src = logoPath ? `/storage/images/${logoPath}` : "/default_logo.png";
                 img.style.width = "25px"; img.style.height = "25px"; img.style.borderRadius = "50%";
                 img.style.border = "2px solid white"; img.style.objectFit = "cover"; el.appendChild(img);
                 const mapMarker = new mapboxgl.Marker(el).setLngLat([marker.showable?.lng, marker.showable.lat]).addTo(mapRef.current);
@@ -232,7 +232,7 @@ export default function MapsPage() {
                         const isOpen = openCardIndex === uniqueKey;
                         return (
                             <div key={uniqueKey}>
-                                {isOpen && (<MarkerCard details={element} onClose={() => setOpenCardIndex(null)} storageBaseUrl={storageBaseUrl} />)}
+                                {isOpen && (<MarkerCard details={element} onClose={() => setOpenCardIndex(null)}  />)}
                             </div>
                         );
                     })
@@ -251,10 +251,11 @@ export default function MapsPage() {
                 onRegister={async ({ name, email }) => {
                     if (regUseForm.processing) return; // debounce
                     if (!name || !email) return;
+                    const payload = { name: (name||'').trim(), email: (email||'').trim().toLowerCase() };
                     setError("");
-                    regUseForm.setData({ ...regUseForm.data, name: (name||'').trim(), email: (email||'').trim().toLowerCase() });
+                    setRegForm((p)=>({ ...p, ...payload }));
                     setLoading(true);
-                    regUseForm.post('/maps/register', {
+                    router.post('/maps/register', payload, {
                         preserveScroll: true,
                         preserveState: true,
                         onSuccess: () => { setError(''); setStep(2); },
@@ -264,11 +265,12 @@ export default function MapsPage() {
                 }}
                 onVerify={async ({ email, code }) => {
                     if (regUseForm.processing) return; // debounce
-                    if (!email || !code) return;
+                    const verifiedEmail = (email || regForm.email || '').trim().toLowerCase();
+                    const verifiedCode = (code || '').trim();
+                    if (!verifiedEmail || !verifiedCode) return;
                     setError("");
-                    regUseForm.setData({ ...regUseForm.data, email: (email||'').trim().toLowerCase(), code: (code||'').trim() });
                     setLoading(true);
-                    regUseForm.post('/maps/verify', {
+                    router.post('/maps/verify', { email: verifiedEmail, code: verifiedCode }, {
                         preserveScroll: true,
                         preserveState: true,
                         onSuccess: () => { setError(''); setStep(3); setRegForm((p)=>({ ...p, code: '' })); },

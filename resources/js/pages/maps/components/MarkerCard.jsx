@@ -1,6 +1,6 @@
 import React from "react";
 
-const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
+const MarkerCard = ({ details, onClose }) => {
     // Normalize values for display (arrays/JSON -> comma list, empties -> dash)
     const toArray = (val) => {
         if (Array.isArray(val)) return val;
@@ -45,7 +45,7 @@ const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
                         <div className="w-[70%]">
                             <div className="w-80 h-52 rounded-md overflow-hidden flex items-center justify-center bg-white">
                                 <img
-                                    src={`/storage/${details.showable.logo}`}
+                                    src={`/storage/images/${details.showable.logo}`}
                                     alt={`${details.showable.name} logo`}
                                     className="w-full h-full object-contain"
                                 />
@@ -67,7 +67,7 @@ const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
                     <div className="flex flex-col sm:flex-row items-center bg-white/90  shadow-md rounded-xl p-4 gap-4 w-96 sm:w-[40vw] mx-auto mt-20 md:mt-0 relative">
                         <div className="w-[70%]">
                             <img
-                                src={storageBaseUrl + `/storage/${details.showable.logo_path}`}
+                                src={`/storage/images/${details.showable.logo_path}`}
                                 alt={`${details.showable.nom} logo_path`}
                                 className="w-80 h-52 object-cover rounded-md"
                             />
@@ -79,7 +79,7 @@ const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
                             <p><span className="font-medium text-gray-500">Pays:</span> {details.showable.pays_origine}</p>
                             <p className="truncate w-80"><span className="font-medium text-gray-500">couverture geographique: </span>{Array.isArray(details.showable.couverture_geographique) ? details.showable.couverture_geographique.join(", ") : details.showable.couverture_geographique || ""}</p>
                             <p className="truncate w-80"><span className="font-medium text-gray-500">Bonnes Pratiques :</span> {details.showable.priorites_thematiques}</p>
-                            
+
                         </div>
                     </div>
                 );
@@ -87,7 +87,7 @@ const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
                 return (
                     <div className="flex flex-col sm:flex-row items-center bg-white/90  shadow-md rounded-xl p-4 gap-4 w-96 sm:w-[40vw] mx-auto mt-20 md:mt-0 relative">
                         <div className="w-[70%]">
-                            <img src={storageBaseUrl + `/storage/${details.showable.logo}`} alt={`${details.showable.nom} logo`} className="w-80 h-52 object-cover rounded-md" />
+                            <img src={ `/storage/images/${details.showable.logo}`} alt={`${details.showable.nom} logo`} className="w-80 h-52 object-cover rounded-md" />
                         </div>
                         <div className="flex flex-col w-full gap-2 text-sm text-gray-800">
                             <p className="font-bold text-lg text-beta">{details.showable.nom}</p>
@@ -96,7 +96,7 @@ const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
                             <p><span className="font-medium text-gray-500">Taille de l'entreprise:</span> {details.showable.taille}</p>
                             <p><span className="font-medium text-gray-500">Site web:</span> <a href={details.showable.site_web} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.showable.website}</a></p>
                             <p><span className="font-medium text-gray-500">Pays:</span> {details.showable.pays_siege}</p>
-                            
+
                         </div>
                     </div>
                 );
@@ -104,13 +104,13 @@ const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
                 return (
                     <div className="flex flex-col sm:flex-row items-center bg-white/90  shadow-md rounded-xl p-4 gap-4 w-96 sm:w-[40vw] mx-auto mt-20 md:mt-0 relative">
                         <div className="w-[70%]">
-                            <img src={storageBaseUrl + `/storage/${details.showable.logo}`} alt={`${details.showable.nom} logo`} className="w-80 h-52 object-cover rounded-md" />
+                            <img src={`/storage/images/${details.showable.logo}`} alt={`${details.showable.nom} logo`} className="w-80 h-52 object-cover rounded-md" />
                         </div>
                         <div className="flex flex-col w-full gap-2 text-sm text-gray-800">
                             <p className="font-bold text-lg text-beta">{details.showable.nom}</p>
                             <p><span className="font-medium text-gray-500">Email:</span> {details.showable.email_institutionnel}</p>
                             <p><span className="font-medium text-gray-500">Type:</span> {details.showable.type_organisation}</p>
-                            
+
                         </div>
                     </div>
                 );
@@ -125,7 +125,7 @@ const MarkerCard = ({ details, onClose, storageBaseUrl }) => {
                             <p><span className="font-medium text-gray-500">Email:</span> {details.showable.email}</p>
                             <p><span className="font-medium text-gray-500">Type:</span> {details.showable.institution_type}</p>
                             <p><span className="font-medium text-gray-500">Pays:</span> {details.showable.country}</p>
-                            
+
                         </div>
                     </div>
                 );

@@ -11,11 +11,11 @@ class SponsorController extends Controller
     public function index()
     {
         $sponsors = Sponsor::orderBy('name')->get();
-        
+
         if (request()->expectsJson()) {
             return response()->json($sponsors);
         }
-        
+
         return Inertia::render('admin/sponsors/index', [
             'sponsors' => $sponsors,
         ]);
@@ -31,13 +31,18 @@ class SponsorController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048',
         ]);
 
-        $path = '';
         if ($request->hasFile('image')) {
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
-            $file->move(public_path('assets/images/sponsors'), $filename);
-            $path = $filename;
+
+            // Store the file inside "storage/app/public/images/sponsors"
+            \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('images/sponsors', $file, $filename);
+
+            // Save the path in the database as "/sponsors/filename"
+            $path = 'sponsors/' . $filename;
         }
+
+
 
         Sponsor::create([
             'name' => $request->name,
@@ -66,13 +71,13 @@ class SponsorController extends Controller
         ]);
 
         $path = $sponsor->path; // Keep existing path by default
-        
+
         if ($request->hasFile('image')) {
             // Delete old image if it exists
             if ($sponsor->path && file_exists(public_path('assets/images/sponsors/' . $sponsor->path))) {
                 unlink(public_path('assets/images/sponsors/' . $sponsor->path));
             }
-            
+
             $file = $request->file('image');
             $filename = time() . '_' . $file->getClientOriginalName();
             $file->move(public_path('assets/images/sponsors'), $filename);
@@ -96,10 +101,8 @@ class SponsorController extends Controller
         if ($sponsor->path && file_exists(public_path('assets/images/sponsors/' . $sponsor->path))) {
             unlink(public_path('assets/images/sponsors/' . $sponsor->path));
         }
-        
+
         $sponsor->delete();
         return redirect()->back()->with('success', 'Sponsor deleted successfully.');
     }
 }
-
-

@@ -152,6 +152,32 @@ const OscFormModal = ({ open, formData, setFormData, onSubmit, onClose, loading,
                         </div>
                     </div>
                 </fieldset>
+                {/* Program core fields */}
+                <fieldset className="bg-gray-100 p-6 rounded-lg mt-4">
+                    <legend className="text-xl font-bold text-alpha mb-4"><TransText en="Program Details" ar="تفاصيل البرنامج" fr="Détails du programme" /></legend>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Program Title" ar="عنوان البرنامج" fr="Titre du programme" /></label>
+                            <input type="text" className="w-full p-2 border rounded-md" name="program_title" value={formData.program_title||''} onChange={(e)=>setFormData({...formData, program_title:e.target.value})} />
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Program Description" ar="وصف البرنامج" fr="Description du programme" /></label>
+                            <textarea className="w-full p-2 border rounded-md" rows="4" name="program_description" value={formData.program_description||''} onChange={(e)=>setFormData({...formData, program_description:e.target.value})}></textarea>
+                        </div>
+                        <div className="space-y-2 md:col-span-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Methodological Approach" ar="المنهجية" fr="Approche méthodologique" /></label>
+                            <textarea className="w-full p-2 border rounded-md" rows="3" name="methodological_approach" value={formData.methodological_approach||''} onChange={(e)=>setFormData({...formData, methodological_approach:e.target.value})}></textarea>
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Target Groups" ar="الفئات المستهدفة" fr="Groupes cibles" /></label>
+                            <input type="text" className="w-full p-2 border rounded-md" name="target_groups" placeholder="e.g. Youth, Women" value={formData.target_groups||''} onChange={(e)=>setFormData({...formData, target_groups:e.target.value})} />
+                        </div>
+                        <div className="space-y-2">
+                            <label className="block text-sm font-medium text-gray-700"><TransText en="Annual Beneficiaries" ar="المستفيدون سنويًا" fr="Bénéficiaires annuels" /></label>
+                            <input type="number" min="0" className="w-full p-2 border rounded-md" name="annual_beneficiaries" value={formData.annual_beneficiaries||''} onChange={(e)=>setFormData({...formData, annual_beneficiaries:e.target.value})} />
+                        </div>
+                    </div>
+                </fieldset>
                 {/* Only show extra fields we actually need: exclude duplicates and system/boolean toggles */}
                 <DynamicFields
                     columns={extraColumns}

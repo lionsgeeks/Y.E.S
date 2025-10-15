@@ -85,7 +85,7 @@ export default function SponsorsIndex({ sponsors }) {
             description: typeof sponsor.description === 'string' ? sponsor.description : JSON.stringify(sponsor.description || {}),
             image: null,
         });
-        setPreviewImage(sponsor.path ? `/assets/images/sponsors/${sponsor.path}` : null);
+        setPreviewImage(sponsor.path ? `/storage/images/${sponsor.path}` : null);
         setIsEditOpen(true);
     };
 
@@ -302,7 +302,7 @@ export default function SponsorsIndex({ sponsors }) {
                                     >
                                         {sponsor.path ? (
                                             <img
-                                                src={`/assets/images/sponsors/${sponsor.path}`}
+                                                src={`/storage/images/${sponsor.path}`}
                                                 alt={sponsor.name}
                                                 className="w-full h-full object-contain p-2"
                                             />
