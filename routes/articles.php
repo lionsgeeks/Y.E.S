@@ -27,7 +27,7 @@ Route::get('/articles/{id}', function ($id) {
     $articles = Article::all();
 
     return Inertia::render('client/articles/[id]', [
-        'article' => (new ArticleResource($article))->resolve(),
-        'articles' => ArticleResource::collection($articles)->resolve(),
+        'article' => $article,
+        'articles' => $articles,
     ]);
 })->name('article.show');

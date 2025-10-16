@@ -37,7 +37,7 @@ const ArticlePage = ({ article, articles }) => {
           <div className="lg:w-[70%] flex flex-col gap-6">
             <img
               className="rounded-lg h-[30rem] w-full object-cover shadow-md"
-              src={resolveImageSrc(article.image)}
+              src={"https://youthempowermentsummit.africa/storage/images/" + article.image}
               alt={pickLang(article.title)}
             />
 
@@ -98,7 +98,7 @@ const ArticlePage = ({ article, articles }) => {
                 className="flex gap-4 p-3 bg-slate-100 rounded-lg hover:bg-slate-200 transition-all duration-200 cursor-pointer"
               >
                 <img
-                  src={resolveImageSrc(e.image)}
+                  src={"https://youthempowermentsummit.africa/storage/images/" + e.image}
                   alt={selectedLanguage === "ar" ? e.title.ar : e.title.en}
                   className="w-2/5 h-24 object-cover rounded-md flex-shrink-0"
                 />
