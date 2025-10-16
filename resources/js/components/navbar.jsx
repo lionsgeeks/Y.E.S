@@ -67,6 +67,10 @@ const Navbar = () => {
       label: { en: "Contact", ar: "اتصل بنا", fr: "Contact" },
       path: "/contact",
     },
+    {
+      label: { en: "Advocacy", ar: "مرافعة", fr: "plaidoyer" },
+      path: "/plaidoyer",
+    },
   ];
   const LANGUAGES = [
     { label: "fr", code: "fr" },
@@ -104,7 +108,7 @@ const Navbar = () => {
 
           <div className="flex items-center gap-3">
             {/* Language Switcher Dropdown (desktop) */}
-         
+
             <button
               onClick={() => setIsToggle(!isToggle)}
               id="menu-toggle"
