@@ -11,23 +11,25 @@ interface TextProps {
 const TransText: React.FC<TextProps> = (props) => {
   const allowedLanguages = ["ar", "fr", "en", "sw", "pr"] as const;
 
-  const readLang = () => {
+  const readLang = (): "ar" | "fr" | "en" | "sw" | "pr" => {
     if (typeof window === "undefined") return "en";
     const saved = window.localStorage.getItem("lang") || "en";
-    return allowedLanguages.includes(saved as any) ? (saved as any) : "en";
+    return (allowedLanguages as readonly string[]).includes(saved)
+      ? (saved as "ar" | "fr" | "en" | "sw" | "pr")
+      : "en";
   };
 
-  const [selectedLanguage, setSelectedLanguage] = useState<"ar" | "fr" | "en" | "sw" | "pr">(readLang() as any);
+  const [selectedLanguage, setSelectedLanguage] = useState<"ar" | "fr" | "en" | "sw" | "pr">(readLang());
 
   useEffect(() => {
-    const onChange = () => setSelectedLanguage(readLang());
-    window.addEventListener("language:change", onChange as EventListener);
-    window.addEventListener("storage", onChange as EventListener);
+    const onChange: EventListener = () => setSelectedLanguage(readLang());
+    window.addEventListener("language:change", onChange);
+    window.addEventListener("storage", onChange);
     return () => {
-      window.removeEventListener("language:change", onChange as EventListener);
-      window.removeEventListener("storage", onChange as EventListener);
+      window.removeEventListener("language:change", onChange);
+      window.removeEventListener("storage", onChange);
     };
-  }, []); // readLang is stable within this module
+  }, [readLang]);
 
   const dictionary = props as unknown as Record<string, string>;
   const text = dictionary[selectedLanguage] ? dictionary[selectedLanguage] : dictionary["en"];
