@@ -60,6 +60,7 @@ const Hero = () => {
         backgroundImage: `url(${s.img})`,
         backgroundSize: "cover",
         backgroundPosition: "center",
+        backgroundPosition:"center 30%"
       }}
     >
       <div className={`flex items-center w-full h-full bg-black/40 text-white ${selectedLanguage === "ar" ? "flex-row-reverse" : ""}`}>
@@ -97,12 +98,12 @@ const Hero = () => {
       {/* ✅ Inertia-friendly page title */}
       <Head title="Hero Section" />
 
-      <div className="h-[75vh] cursor-grab">
+      <div className="h-[80vh] cursor-grab">
         <AutoCarousel
           slides={renderedSlides}
           className="h-full"
           intervalMs={3000}
-          transitionMs={700}
+          transitionMs={400}
         />
       </div>
     </>

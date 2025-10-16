@@ -8,7 +8,7 @@ export const AboutSection = () => {
     return (
         <>
             <div
-                className={`w-full h-[50vh] bg-muted-background relative z-10 text-white lg:px-16 flex flex-col justify-center gap-3 bg-no-repeat bg-cover bg-center bg-[url('/assets/images/africa2.jpg')] `}
+className={`w-full h-[50vh] bg-muted-background relative z-10 text-white lg:px-16 flex flex-col justify-center gap-3 bg-no-repeat bg-cover bg-[url('/assets/images/africa4.jpg')] bg-[position:center_10%]`}
             >
 
                 <div className="inset-0 absolute bg-gradient-to-r from-black via-[#53450ab5] via-50%  to-alpha opacity-85 -z-10"></div>

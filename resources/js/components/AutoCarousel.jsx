@@ -8,7 +8,7 @@ const clampIndex = (index, length) => {
 
 const AutoCarousel = ({
   slides,
-  intervalMs = 3500,
+  intervalMs = 4000,
   className = "",
   showArrows = true,
   showDots = true,
