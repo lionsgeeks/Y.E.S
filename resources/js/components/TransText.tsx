@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 interface TextProps {
   ar: string;
@@ -17,19 +17,20 @@ const TransText: React.FC<TextProps> = (props) => {
     return allowedLanguages.includes(saved as any) ? (saved as any) : "en";
   };
 
-  const [selectedLanguage, setSelectedLanguage] = useState<string>(readLang());
+  const [selectedLanguage, setSelectedLanguage] = useState<"ar" | "fr" | "en" | "sw" | "pr">(readLang() as any);
 
   useEffect(() => {
     const onChange = () => setSelectedLanguage(readLang());
-    window.addEventListener("language:change", onChange as any);
-    window.addEventListener("storage", onChange);
+    window.addEventListener("language:change", onChange as EventListener);
+    window.addEventListener("storage", onChange as EventListener);
     return () => {
-      window.removeEventListener("language:change", onChange as any);
-      window.removeEventListener("storage", onChange);
+      window.removeEventListener("language:change", onChange as EventListener);
+      window.removeEventListener("storage", onChange as EventListener);
     };
-  }, []);
+  }, []); // readLang is stable within this module
 
-  const text = (props as any)[selectedLanguage] ? (props as any)[selectedLanguage] : (props as any)["en"];
+  const dictionary = props as unknown as Record<string, string>;
+  const text = dictionary[selectedLanguage] ? dictionary[selectedLanguage] : dictionary["en"];
 
   return (
     <span dangerouslySetInnerHTML={{ __html: text?.replace(/\n/g, "<br />") }} />
