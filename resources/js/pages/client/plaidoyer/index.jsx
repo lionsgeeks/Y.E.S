@@ -2,6 +2,7 @@ import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 import TransText from "@components/TransText";
 import { useForm } from "@inertiajs/react";
+import { useState } from "react";
 
 const PlaidoyerPage = () => {
   const { data, setData, transform, post, processing, reset, errors } = useForm({
@@ -26,10 +27,62 @@ const PlaidoyerPage = () => {
     post("/plaidoyer", { onSuccess: () => reset() });
   };
 
+  const manifestos = [
+    { code: "fr", label: "Français", path: "/assets/pdfs/manifesto fr.pdf" },
+    { code: "en", label: "English", path: "/assets/pdfs/manifesto eng (1).pdf" },
+    { code: "ar", label: "العربية", path: "/assets/pdfs/manifesto ar.pdf" },
+    { code: "pr", label: "Português", path: "/assets/pdfs/manifesto prtg.pdf" },
+    { code: "sw", label: "Swahili", path: "/assets/pdfs/manifesto swahili.pdf" },
+    { code: "tf", label: "Tafinaght", path: "/assets/pdfs/manifesto tafinaght.pdf" },
+  ];
+  const [selectedManifesto, setSelectedManifesto] = useState(manifestos[0]);
+
   return (
     <>
       <Navbar />
-      <div className={`flex gap-5 py-[10vh] px-[5vw] lg:flex-row flex-col`}>
+      {/* Manifestos cards section */}
+      <div className="px-[5vw] pt-[6vh] pb-[2vh] flex flex-col gap-4 overflow-hidden">
+        <p className="text-2xl font-medium">
+          <TransText fr="YES AFRICA Manifestes" en="YES AFRICA Manifestos" ar="بيانات YES AFRICA" />
+        </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {manifestos.map((m) => (
+            <div key={m.code} className="border rounded-lg shadow-sm overflow-hidden bg-[white]">
+              <div className="relative w-full bg-gray-100 overflow-hidden" style={{ height: "38vh"  }}>
+                <iframe
+                  title={`preview-${m.code}`}
+                  src={`${m.path}#page=1&zoom=page-width&toolbar=0&navpanes=0&statusbar=0`}
+                  className="absolute top-0 left-0 pointer-events-none"
+                  style={{
+                    border: "none",
+                    overflow: "hidden",
+                    width: "calc(100% + 3vw)",
+                    height: "calc(100% + 12vh)",
+                    top: "-6vh",
+                    left: "-1vw",
+                    paddingTop: "9%",
+                  }}
+                  scrolling="no"
+                />
+              </div>
+              <div className="p-3 flex items-center gap-3 justify-between">
+                <span className="font-medium">{m.label}</span>
+                <div className="flex items-center gap-3">
+                  <a href={m.path} target="_blank" rel="noreferrer" className="underline">
+                    <TransText fr="Ouvrir" en="Open" ar="فتح" />
+                  </a>
+                  <a href={m.path} download className="underline">
+                    <TransText fr="Télécharger" en="Download" ar="تنزيل" />
+                  </a>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Intro and form */}
+      <div className={`flex gap-5 py-[6vh] px-[5vw] lg:flex-row flex-col`}>
         <div className={`lg:w-[50%] flex flex-col gap-5`}>
           <p className="text-3xl font-medium">Plaidoyer</p>
           <p className="text-lg w-[90%]">Formulaire de Recommandation</p>
