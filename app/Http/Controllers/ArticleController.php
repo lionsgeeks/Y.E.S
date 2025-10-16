@@ -43,7 +43,7 @@ class ArticleController extends Controller
 
         // ✅ Handle image upload
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('articles', 'public');
+            $imagePath = $request->file('image')->store('images/articles', 'public');
         } else {
             return back()->withErrors(['image' => 'Image upload failed']);
         }
@@ -102,7 +102,7 @@ class ArticleController extends Controller
 
         $imagePath = $article->image; // keep existing relative path
         if ($request->hasFile('image')) {
-            $imagePath = $request->file('image')->store('articles', 'public');
+            $imagePath = $request->file('image')->store('images/articles', 'public');
         }
 
         // normalize access for array|object values from old records
