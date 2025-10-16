@@ -18,7 +18,7 @@ Route::middleware(['auth', 'verified'])->prefix('admin')->group(function () {
 Route::get('/articles', function () {
     $articles = Article::all();
     return Inertia::render('client/articles/index', [
-        'articles' => ArticleResource::collection($articles)->resolve(),
+        'articles' => $articles,
     ]);
 })->name('acticles');
 

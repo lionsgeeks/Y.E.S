@@ -4,10 +4,10 @@ import TransText from "@/components/TransText";
 
 const ArticleCard = ({ article , index }) => {
     const { selectedLanguage } = 'eng';
-    const resolveImageSrc = (value) => {
-        if (!value) return '';
-        return /^https?:\/\//i.test(value) ? value : `/storage/${value}`;
-    }
+    // const resolveImageSrc = (value) => {
+    //     if (!value) return '';
+    //     return /^https?:\/\//i.test(value) ? value : `/storage/${value}`;
+    // }
     const arrow = (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -25,13 +25,16 @@ const ArticleCard = ({ article , index }) => {
         </svg>
     );
 
+
+    console.log(article)
+
     return (
         <>
             <div
                 className={`flex flex-col gap-2 lg:w-[calc(calc(100%-2.5rem)/3)] border rounded-lg shadow-sm ${selectedLanguage == "ar" ? "text-right" : ""
                     }`}
             >
-                <img className="w-full h-[35vh] object-cover rounded-t-md" src={resolveImageSrc(article.image)} alt="" />
+                <img className="w-full h-[35vh] object-cover rounded-t-md" src={"storage/images/"+article.image} alt="" />
                 <div className={`p-3 gap-3 flex flex-col ${selectedLanguage == "ar" ? "justify-end" : ""}`}>
                     {
                         article.title.en.length > 30 ? (
