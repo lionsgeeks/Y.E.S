@@ -130,7 +130,7 @@ const EventInfo = () => {
                 </button>
               </a> */}
 
-              <Link to={"/plaidoyer"}>
+              <Link target="_blank" to={"/plaidoyer"}>
                 <button className="bg-transparent border-2 lg:text-lg text-white border-white  hover:border-alpha hover:text-alpha px-8 py-2.5 w-fit rounded-lg font-medium transition-[background-color] duration-[700ms]">
                   <TransText {...contactBtn} />
                 </button>

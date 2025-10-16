@@ -12,7 +12,6 @@ const ArticlesPage = ({ articles }) => {
     return (
         <>
             <Navbar />
-            <HeroArticles />
             {
                 articles ? (
                     <div className="">

@@ -14,14 +14,18 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\MapController as PagesMapController;
 use App\Http\Controllers\Api\MapController;
+use App\Models\Article;
 
 Route::get('/', function () {
     $sponsors = [];
     if (Schema::hasTable('sponsors')) {
         $sponsors = Sponsor::where('type', '!=', 'organizer')->get();
     }
+
+    $articles = Article::all();
     return Inertia::render('client/home/home', [
-        'sponsors' => $sponsors
+        'sponsors' => $sponsors,
+         'articles' => $articles,
     ]);
 })->name('home');
 Route::get('/contact', function () {

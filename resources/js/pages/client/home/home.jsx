@@ -7,7 +7,7 @@ import Who from "./components/who";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
 
-const HomePage = ({ sponsors = [] }) => {
+const HomePage = ({ sponsors = [] , articles }) => {
     return (
         <>
             <Navbar />
@@ -28,7 +28,7 @@ const HomePage = ({ sponsors = [] }) => {
 
             {/* articles */}
             {/* hadi hta tqad backend o ndiroha hadi dyal articles */}
-            <HeroArticles />
+            <HeroArticles articles={articles}/>
             <Footer />
         </>
     );
