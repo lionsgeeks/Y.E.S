@@ -40,8 +40,8 @@ const Footer = () => {
   return (
     <div>
       <div className="container mx-auto px-4 py-10 border-t-2 border-gray-100">
-        <div className={`flex flex-wrap text-left lg:text-left`}>
-          <div className={`w-full lg:w-6/12 px-4`}>
+        <div className={`flex flex-wrap lg:flex-nowrap justify-between items-start text-left`}>
+          <div className={`w-full lg:w-7/12 px-4 max-w-[720px]`}>
             <h4 className="text-3xl fonat-semibold text-blueGray-700">
               <TransText ar="دعنا نبقى على تواصل" en="Let's keep in touch!" fr="Restons en contact !" />
             </h4>
@@ -70,9 +70,9 @@ const Footer = () => {
               </div>
             </div>
           </div>
-          <div className={`w-full lg:w-6/12 px-4`}>
+          <div className={`w-full lg:w-4/12 px-4`}>
             <div className="flex flex-wrap items-top mb-6 gap-5">
-              <div className="w-full lg:w-4/12 px-4 ml-auto">
+              <div className="w-full px-4 ml-auto">
                 <span className="block uppercase text-blueGray-500 text-sm font-semibold mb-2">
                   <TransText ar="روابط مفيدة" en="Useful Links" fr="Liens utiles" />
                 </span>

@@ -83,7 +83,7 @@ const PlaidoyerPage = () => {
 
       {/* Intro and form */}
       <div className={`flex gap-5 py-[6vh] px-[5vw] lg:flex-row flex-col`}>
-        <div className={`lg:w-[50%] flex flex-col gap-5`}>
+        <div className={`lg:w-[50%] flex flex-col gap-5 ${typeof window !== 'undefined' && (localStorage.getItem('lang')||'en')==='ar' ? 'text-right items-end' : ''}`}>
           <p className="text-3xl font-medium">Plaidoyer</p>
           <p className="text-lg w-[90%]">Formulaire de Recommandation</p>
           <p className="text-lg w-[90%]">
@@ -91,7 +91,7 @@ const PlaidoyerPage = () => {
           </p>
         </div>
 
-        <form onSubmit={submit} className={`lg:w-[50%] flex flex-col gap-3`}>
+        <form onSubmit={submit} className={`lg:w-[50%] flex flex-col gap-3 ${typeof window !== 'undefined' && (localStorage.getItem('lang')||'en')==='ar' ? 'text-right' : ''}`}>
           <div className="flex flex-col gap-2">
             <label>Nom et Prénom</label>
             <input

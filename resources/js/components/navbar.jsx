@@ -7,7 +7,11 @@ const yeslogo = "/assets/images/yeslogo.png";
 const Navbar = () => {
   const [isToggle, setIsToggle] = useState(false);
   const [dropdownIsOpen, setDropdownIsOpen] = useState(false);
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const langRef = useRef(null);
+  const [lang, setLang] = useState(typeof window !== "undefined" ? (localStorage.getItem("lang") || "en") : "en");
+  const isAr = typeof window !== "undefined" ? ((localStorage.getItem("lang") || "en") === "ar") : false;
   const toggleDropdown = () => {
     setDropdownIsOpen(!dropdownIsOpen);
   };
@@ -16,11 +20,30 @@ const Navbar = () => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setDropdownIsOpen(false);
     }
+    if (langRef.current && !langRef.current.contains(event.target)) {
+      setLangDropdownOpen(false);
+    }
   };
   useEffect(() => {
     document.addEventListener("click", handleClickOutside);
+    // init dir based on saved language
+    if (typeof document !== "undefined") {
+      document.documentElement.setAttribute("dir", (localStorage.getItem("lang") || "en") === "ar" ? "rtl" : "ltr");
+    }
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
+
+  const changeLang = (code) => {
+    setLang(code);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("lang", code);
+      const evt = new Event("language:change");
+      window.dispatchEvent(evt);
+      if (typeof document !== "undefined") {
+        document.documentElement.setAttribute("dir", code === "ar" ? "rtl" : "ltr");
+      }
+    }
+  };
 
   const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
 
@@ -46,9 +69,9 @@ const Navbar = () => {
     },
   ];
   const LANGUAGES = [
-    { label: "Français", code: "fr" },
-    { label: "English", code: "en" },
-    { label: "العربية", code: "ar" },
+    { label: "fr", code: "fr" },
+    { label: "en", code: "en" },
+    { label: "ar", code: "ar" },
   ];
   const logos = [
     {
@@ -79,7 +102,9 @@ const Navbar = () => {
             </div>
           </div>
 
-          <div className="flex items-center">
+          <div className="flex items-center gap-3">
+            {/* Language Switcher Dropdown (desktop) */}
+         
             <button
               onClick={() => setIsToggle(!isToggle)}
               id="menu-toggle"
@@ -134,6 +159,47 @@ const Navbar = () => {
                   );
                 }
               })}
+                 <div className="relative hidden md:block" ref={langRef}>
+              <button
+                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                className=" py-1.5  rounded text-sm text-alpha hover:text-beta flex items-center gap-2"
+              >
+                {LANGUAGES.find((l) => l.code === lang)?.label || "English"}
+                <svg className={`w-4 h-4 transition-transform ${langDropdownOpen ? "rotate-180" : ""}`} viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+                </svg>
+              </button>
+              {langDropdownOpen && (
+                <ul className={`absolute mt-2 w-40 bg-white border rounded shadow z-20 ${isAr ? "left-0 text-right" : "right-0 text-left"}`}>
+                  {LANGUAGES.map((l) => (
+                    <li key={l.code}>
+                      <button
+                        onClick={() => {
+                          changeLang(l.code);
+                          setLangDropdownOpen(false);
+                        }}
+                        className={`w-full ${isAr ? "text-right" : "text-left"} px-3 py-2 text-sm ${lang === l.code ? "bg-alpha text-white" : "text-alpha hover:bg-gray-50"}`}
+                      >
+                        {l.label}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
+              {/* Mobile language dropdown at end */}
+              <li className="md:hidden w-full mt-3">
+                <select
+                  value={lang}
+                  onChange={(e) => changeLang(e.target.value)}
+                  className={`w-full border rounded px-3 py-2 text-sm text-alpha ${isAr ? "text-right" : ""}`}
+                >
+                  {LANGUAGES.map((l) => (
+                    <option key={l.code} value={l.code}>{l.label}</option>
+                  ))}
+                </select>
+              </li>
+
             </ul>
           </div>
         </div>

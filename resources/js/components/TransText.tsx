@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 interface TextProps {
   ar: string;
@@ -9,19 +9,27 @@ interface TextProps {
 }
 
 const TransText: React.FC<TextProps> = (props) => {
-  const  selectedLanguage  = "en";
+  const allowedLanguages = ["ar", "fr", "en", "sw", "pr"] as const;
 
-  const allowedLanguages = ["ar", "fr", "en", "sw", "pr"];
+  const readLang = () => {
+    if (typeof window === "undefined") return "en";
+    const saved = window.localStorage.getItem("lang") || "en";
+    return allowedLanguages.includes(saved as any) ? (saved as any) : "en";
+  };
 
-  if (!allowedLanguages.includes(selectedLanguage)) {
-    throw new Error(
-      `Invalid language: ${selectedLanguage}. Supported languages are: ${allowedLanguages.join(
-        ", "
-      )}`
-    );
-  }
+  const [selectedLanguage, setSelectedLanguage] = useState<string>(readLang());
 
-  const text = props[selectedLanguage] ? props[selectedLanguage] : props["en"];
+  useEffect(() => {
+    const onChange = () => setSelectedLanguage(readLang());
+    window.addEventListener("language:change", onChange as any);
+    window.addEventListener("storage", onChange);
+    return () => {
+      window.removeEventListener("language:change", onChange as any);
+      window.removeEventListener("storage", onChange);
+    };
+  }, []);
+
+  const text = (props as any)[selectedLanguage] ? (props as any)[selectedLanguage] : (props as any)["en"];
 
   return (
     <span dangerouslySetInnerHTML={{ __html: text?.replace(/\n/g, "<br />") }} />
