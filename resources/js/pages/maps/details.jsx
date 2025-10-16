@@ -1,7 +1,8 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+// import { useLocation, useNavigate } from 'react-router-dom';
+
+import { Link } from "@inertiajs/react";
 
 const DetailsPage = () => {
-    const navigate = useNavigate();
     const { state } = useLocation();
     const { details, type } = state || {};
 
@@ -662,12 +663,12 @@ const DetailsPage = () => {
 
     return (
         <div className="min-h-screen bg-gray-50 p-8">
-            <button
-                onClick={() => navigate(-1)}
+            <Link
+                href={"/map"}
                 className="mb-8 p-2  text-beta border border-beta rounded "
             >
                 ← Retour à la carte
-            </button>
+            </Link>
             {renderContent()}
         </div>
     );

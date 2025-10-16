@@ -67,9 +67,7 @@ const Articles = ({ articles }) => {
                             {/* Image */}
                             {article.image && (
                                 <img
-                                    src={/^https?:\/\//i.test(article.image)
-                                        ? article.image
-                                        : `/storage/${String(article.image).replace(/^\/?storage\//, '')}`}
+                                    src={"storage/articles/"+article.image}
                                     alt={article.title.en}
                                     className="w-full h-28 sm:h-32 md:h-36 object-cover"
                                 />
