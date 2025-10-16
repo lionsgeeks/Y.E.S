@@ -20,3 +20,4 @@ class PlaidoyerRecommendation extends Model
 }
 
 
+
