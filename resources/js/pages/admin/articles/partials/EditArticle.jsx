@@ -23,12 +23,8 @@ const EditArticle = ({ article }) => {
     const [tags, setTags] = useState(initialTags);
     const [tagInput, setTagInput] = useState('');
     const [image, setImage] = useState(null);
-    const initialPreview = useMemo(() => {
-        const value = article?.image;
-        if (!value) return '';
-        return /^https?:\/\//i.test(value) ? value : `/storage/${String(value).replace(/^\/?storage\//, '')}`;
-    }, [article]);
-    const [preview, setPreview] = useState(initialPreview);
+
+    const [preview, setPreview] = useState("https://youthempowermentsummit.africa/storage/images/"+article?.image);
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
 
