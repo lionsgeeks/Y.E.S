@@ -22,7 +22,7 @@ const ArticlePage = ({ article, articles }) => {
     }
     return safe(obj);
   };
-  const truncate = (s, n) => (safe(s).length > n ? safe(s).substring(0, n) + '...' : safe(s));
+  const truncate = (s, n) => (safe(s).length > n ? safe(s).sucssbstring(0, n) + '...' : safe(s));
 
   return (
     <>

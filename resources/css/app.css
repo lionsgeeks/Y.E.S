@@ -221,9 +221,7 @@ html, body {
   color: var(--alpha);
 }
 
-body {
-  font-family: "Poppins", ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
-}
+
 /* To Reset Tailwind Classes in a div and it's children */
 .reset-tw,
 .reset-tw * {
