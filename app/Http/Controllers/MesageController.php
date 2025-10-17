@@ -6,13 +6,16 @@ use App\Mail\ContactMail;
 use App\Models\Message;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Inertia\Inertia;
 
 class MesageController extends Controller
 {
     public function index()
     {
-        $messages = Message::all()->sortByDesc("created_at");
-        return view("messages.messages", compact("messages"));
+        $messages = Message::orderByDesc('created_at')->get();
+        return Inertia::render('admin/messages/index', [
+            'messages' => $messages,
+        ]);
     }
     public function update(Request $request, Message $message)
     {
