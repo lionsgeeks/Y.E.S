@@ -15,29 +15,56 @@ export default function ScientificCommitteesIndex({ scientificCommittees }) {
     const [isCreateOpen, setIsCreateOpen] = useState(false);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [editingMember, setEditingMember] = useState(null);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         position: '',
         linkedin_url: '',
+        photo_path: '',
         bio: '',
         order: 0,
         is_active: true,
     });
+    const [photoFile, setPhotoFile] = useState(null);
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setIsSubmitting(true);
+        const data = new FormData();
+        Object.entries(formData).forEach(([key, value]) => {
+            data.append(key, value ?? '');
+        });
+        if (photoFile) {
+            data.append('photo_path', photoFile);
+        }
+
         if (editingMember) {
-            router.post(`/admin/scientific-committees/${editingMember.id}`, {
-                ...formData,
-                _method: 'PUT',
+            data.append('_method', 'POST');
+            router.post(`/admin/scientific-committees/${editingMember.id}`, data, {
+                forceFormData: true,
+                onSuccess: () => {
+                    setIsEditOpen(false);
+                    setEditingMember(null);
+                    setFormData({ name: '', position: '', linkedin_url: '', photo_path: '', bio: '', order: 0, is_active: 1 });
+                    setPhotoFile(null);
+                },
+                onFinish: () => {
+                    setIsSubmitting(false);
+                },
             });
         } else {
-            router.post('/admin/scientific-committees', formData);
+            router.post('/admin/scientific-committees', data, {
+                forceFormData: true,
+                onSuccess: () => {
+                    setIsCreateOpen(false);
+                    setFormData({ name: '', position: '', linkedin_url: '', photo_path: '', bio: '', order: 0, is_active: 1 });
+                    setPhotoFile(null);
+                },
+                onFinish: () => {
+                    setIsSubmitting(false);
+                },
+            });
         }
-        setIsCreateOpen(false);
-        setIsEditOpen(false);
-        setEditingMember(null);
-        setFormData({ name: '', position: '', linkedin_url: '', bio: '', order: 0, is_active: true });
     };
 
     const handleEdit = (member) => {
@@ -46,10 +73,12 @@ export default function ScientificCommitteesIndex({ scientificCommittees }) {
             name: member.name,
             position: member.position || '',
             linkedin_url: member.linkedin_url || '',
+            photo_path: member.photo_path || '',
             bio: member.bio || '',
             order: member.order,
             is_active: member.is_active,
         });
+        setPhotoFile(null);
         setIsEditOpen(true);
     };
 
@@ -73,20 +102,30 @@ export default function ScientificCommitteesIndex({ scientificCommittees }) {
         ]}>
             <Head title="Scientific Committee Management" />
 
-            <div className="space-y-6">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900">Scientific Committee</h1>
-                        <p className="text-gray-600 mt-2">Manage scientific committee members</p>
-                    </div>
-                    <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                        <DialogTrigger asChild>
-                            <Button className="bg-[#2e539d] hover:bg-[#1e3d7a] text-white">
-                                <Plus className="w-4 h-4 mr-2" />
-                                Add Member
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[500px]">
+            <div className="py-10 relative">
+                {/* Background Pattern to match Sponsors page */}
+                <div className="absolute inset-0 bg-gradient-to-br from-gray-50/50 to-white/30 rounded-2xl -z-10"></div>
+                <div
+                    className="absolute inset-0 opacity-20 -z-10"
+                    style={{
+                        backgroundImage:
+                            `url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23f3f4f6' fill-opacity='0.3'%3E%3Ccircle cx='20' cy='20' r='1'/%3E%3C/g%3E%3C/svg%3E")`,
+                    }}
+                ></div>
+                <div className="p-6">
+                    <div className="flex items-center justify-between mb-6">
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900">Scientific Committee</h1>
+                            <p className="text-gray-500 text-sm">{scientificCommittees.length} members</p>
+                        </div>
+                        <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+                            <DialogTrigger asChild>
+                                <Button className="bg-[#2e539d] hover:bg-[#1e3d7a] text-white">
+                                    <Plus className="w-4 h-4 mr-2" />
+                                    Add Member
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[500px]">
                             <DialogHeader>
                                 <DialogTitle>Add Committee Member</DialogTitle>
                                 <DialogDescription>
@@ -103,6 +142,19 @@ export default function ScientificCommitteesIndex({ scientificCommittees }) {
                                         placeholder="Enter full name"
                                         required
                                     />
+                                </div>
+                                <div className="space-y-2">
+                                    <Label htmlFor="photo">Photo</Label>
+                                    <Input
+                                        id="photo"
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+                                    />
+                                    <p className="text-xs text-gray-500">PNG, JPG up to 2MB. Stored under /storage/comittee-scientifique</p>
+                                    {photoFile && (
+                                        <div className="mt-2 text-xs text-gray-600">Selected: {photoFile.name}</div>
+                                    )}
                                 </div>
                                 <div className="space-y-2">
                                     <Label htmlFor="position">Position/Title</Label>
@@ -143,95 +195,83 @@ export default function ScientificCommitteesIndex({ scientificCommittees }) {
                                         placeholder="0"
                                     />
                                 </div>
-                                <div className="flex items-center space-x-2">
-                                    <Switch
-                                        id="is_active"
-                                        checked={formData.is_active}
-                                        onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                                    />
-                                    <Label htmlFor="is_active">Active</Label>
-                                </div>
+                            
                                 <div className="flex justify-end space-x-2">
-                                    <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)}>
+                                    <Button type="button" variant="outline" onClick={() => setIsCreateOpen(false)} disabled={isSubmitting}>
                                         Cancel
                                     </Button>
-                                    <Button type="submit" className="bg-[#2e539d] hover:bg-[#1e3d7a] text-white">
-                                        Add Member
+                                    <Button type="submit" className="bg-[#2e539d] hover:bg-[#1e3d7a] text-white" disabled={isSubmitting}>
+                                        {isSubmitting ? 'Adding...' : 'Add Member'}
                                     </Button>
                                 </div>
                             </form>
                         </DialogContent>
-                    </Dialog>
+                        </Dialog>
+                    </div>
                 </div>
 
-                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-4 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 p-6">
                     {scientificCommittees.map((member) => (
-                        <Card key={member.id} className="hover:shadow-lg transition-shadow">
-                            <CardHeader>
-                                <div className="flex items-center justify-between">
-                                    <div className="flex items-center space-x-2">
-                                        <User className="w-5 h-5 text-[#2e539d]" />
-                                        <CardTitle className="text-lg">{member.name}</CardTitle>
+                        <Card key={member.id} className="group hover:shadow-lg transition-all duration-200 border-0 bg-white/50 backdrop-blur-sm">
+                            <CardContent className="p-4">
+                                <div className="flex flex-col items-center space-y-3">
+                                    {/* Avatar */}
+                                    <div className="relative w-20 h-20 bg-white rounded-full shadow-sm border flex items-center justify-center overflow-hidden">
+                                        {member.photo_path ? (
+                                            <img
+                                                src={`/storage/images/${member.photo_path}`}
+                                                alt={member.name}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        ) : (
+                                            <User className="w-8 h-8 text-gray-400" />
+                                        )}
                                     </div>
-                                    <div className="flex items-center space-x-2">
-                                        <Badge variant={member.is_active ? "default" : "secondary"}>
-                                            {member.is_active ? 'Active' : 'Inactive'}
-                                        </Badge>
-                                        <Switch
-                                            checked={member.is_active}
-                                            onCheckedChange={() => handleToggleActive(member.id, member.is_active)}
-                                            size="sm"
-                                        />
-                                    </div>
-                                </div>
-                                <CardDescription>
-                                    {member.position && (
-                                        <div className="text-sm font-medium text-[#b09417] mb-1">
-                                            {member.position}
+
+                                    {/* Info */}
+                                    <div className="text-center space-y-1">
+                                        <h3 className="font-medium text-sm text-gray-900 truncate w-40" title={member.name}>
+                                            {member.name}
+                                        </h3>
+                                        <div className="flex items-center justify-center gap-2">
+
+                                            {member.position && (
+                                                <span className="text-[11px] text-[#b09417] font-medium truncate max-w-[8rem]" title={member.position}>
+                                                    {member.position}
+                                                </span>
+                                            )}
                                         </div>
-                                    )}
-                                    Order: {member.order}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="space-y-3">
-                                    {member.linkedin_url && (
-                                        <div className="flex items-center space-x-2">
-                                            <ExternalLink className="w-4 h-4 text-gray-500" />
+                                        <p className="text-xs text-gray-500">Order: {member.order}</p>
+                                    </div>
+
+                                    {/* Actions */}
+                                    <div className="flex items-center space-x-2">
+                                        <button
+                                            onClick={() => handleEdit(member)}
+                                            className="p-2 bg-gray-100 hover:bg-gray-200 rounded-full transition-colors"
+                                            title="Edit"
+                                        >
+                                            <Edit className="w-4 h-4 text-gray-600" />
+                                        </button>
+                                        <button
+                                            onClick={() => handleDelete(member.id)}
+                                            className="p-2 bg-red-100 hover:bg-red-200 rounded-full transition-colors"
+                                            title="Delete"
+                                        >
+                                            <Trash2 className="w-4 h-4 text-red-600" />
+                                        </button>
+
+                                        {member.linkedin_url && (
                                             <a
                                                 href={member.linkedin_url}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
-                                                className="text-[#2e539d] hover:text-[#b09417] text-sm truncate"
+                                                className="p-2 bg-blue-100 hover:bg-blue-200 rounded-full transition-colors"
+                                                title="LinkedIn"
                                             >
-                                                LinkedIn Profile
+                                                <ExternalLink className="w-4 h-4 text-blue-600" />
                                             </a>
-                                        </div>
-                                    )}
-                                    {member.bio && (
-                                        <p className="text-sm text-gray-600 line-clamp-3">
-                                            {member.bio}
-                                        </p>
-                                    )}
-                                    <div className="flex space-x-2">
-                                        <Button
-                                            size="sm"
-                                            variant="outline"
-                                            onClick={() => handleEdit(member)}
-                                            className="flex-1"
-                                        >
-                                            <Edit className="w-4 h-4 mr-1" />
-                                            Edit
-                                        </Button>
-                                        <Button
-                                            size="sm"
-                                            variant="destructive"
-                                            onClick={() => handleDelete(member.id)}
-                                            className="flex-1"
-                                        >
-                                            <Trash2 className="w-4 h-4 mr-1" />
-                                            Delete
-                                        </Button>
+                                        )}
                                     </div>
                                 </div>
                             </CardContent>
@@ -277,6 +317,18 @@ export default function ScientificCommitteesIndex({ scientificCommittees }) {
                                 />
                             </div>
                             <div className="space-y-2">
+                                <Label htmlFor="edit-photo">Photo</Label>
+                                <Input
+                                    id="edit-photo"
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={(e) => setPhotoFile(e.target.files?.[0] || null)}
+                                />
+                                {formData.photo_path && (
+                                    <div className="text-xs text-gray-600">Current: {formData.photo_path}</div>
+                                )}
+                            </div>
+                            <div className="space-y-2">
                                 <Label htmlFor="edit-position">Position/Title</Label>
                                 <Input
                                     id="edit-position"
@@ -315,20 +367,13 @@ export default function ScientificCommitteesIndex({ scientificCommittees }) {
                                     placeholder="0"
                                 />
                             </div>
-                            <div className="flex items-center space-x-2">
-                                <Switch
-                                    id="edit-is_active"
-                                    checked={formData.is_active}
-                                    onCheckedChange={(checked) => setFormData({ ...formData, is_active: checked })}
-                                />
-                                <Label htmlFor="edit-is_active">Active</Label>
-                            </div>
+
                             <div className="flex justify-end space-x-2">
-                                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)}>
+                                <Button type="button" variant="outline" onClick={() => setIsEditOpen(false)} disabled={isSubmitting}>
                                     Cancel
                                 </Button>
-                                <Button type="submit" className="bg-[#2e539d] hover:bg-[#1e3d7a] text-white">
-                                    Update Member
+                                <Button type="submit" className="bg-[#2e539d] hover:bg-[#1e3d7a] text-white" disabled={isSubmitting}>
+                                    {isSubmitting ? 'Updating...' : 'Update Member'}
                                 </Button>
                             </div>
                         </form>

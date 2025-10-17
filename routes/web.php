@@ -33,8 +33,13 @@ Route::get('/contact', function () {
 })->name('contact');
 Route::get('/about', function () {
     $sponsors = Sponsor::all();
+    $committee = [];
+    if (Schema::hasTable('scientific_committees')) {
+        $committee = \App\Models\ScientificCommittee::where('is_active', true)->orderBy('order')->orderBy('name')->get();
+    }
     return Inertia::render('client/about/index', [
-        'sponsors' => $sponsors
+        'sponsors' => $sponsors,
+        'committee' => $committee,
     ]);
 })->name('about');
 Route::get('/form', function () {

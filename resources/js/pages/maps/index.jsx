@@ -42,8 +42,8 @@ export default function MapsIndex() {
         <div className="relative min-h-screen">
             <Navbar />
             <MapView
-                accessToken="pk.eyJ1IjoiaGFtemFvZmsiLCJhIjoiY2x3MnN0cmRrMHJoYTJpb2N2OGQ2eTNnOSJ9.aLy9CQtGLr0A3rlH3x2TRg"
-                styleUrl="mapbox://styles/hamzaofk/cmal8x5y8014m01qo11gd0w40"
+                accessToken="pk.eyJ1IjoiYm9qb2F5bWFuIiwiYSI6ImNtZ3RnaTI4MjAzcXoybnNoaDNkbDQ1cncifQ.zchikKt-8FjepLWp3AcZWg"
+                styleUrl="mapbox://styles/bojoayman/cmgtvy1fz002201qx0bk4gutj"
                 center={[20.9394, 6.6111]}
                 zoom={2.5}
                 markers={filtered.map((m) => ({ id: m.id, lat: m.lat, lng: m.lng, iconUrl: m.logo }))}
