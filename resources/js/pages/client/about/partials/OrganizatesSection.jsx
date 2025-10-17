@@ -72,7 +72,7 @@ export const OrganizatesSection = ({ sponsors }) => {
                                     {org.paths.map((path, i) => (
                                         <img
                                             key={i}
-                                            src={`/${path}`}
+                                            src={`storage/images/${path}`}
                                             alt={org.name}
                                             className={`${org.name === "UCGC"
                                                 ? "w-[210px]"
@@ -135,7 +135,7 @@ export const OrganizatesSection = ({ sponsors }) => {
                                     {org.paths.map((path, i) => (
                                         <img
                                             key={i}
-                                            src={`/${path}`}
+                                            src={`storage/images/${path}`}
                                             alt={org.name}
                                             className={`${org.name === "UCGC"
                                                 ? "w-[210px]"

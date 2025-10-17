@@ -163,7 +163,7 @@ const Navbar = () => {
                   );
                 }
               })}
-                 <div className="relative hidden md:block" ref={langRef}>
+                 <div className="relative  hidden md:block" ref={langRef}>
               <button
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
                 className=" py-1.5  rounded text-sm text-alpha hover:text-beta flex items-center gap-2"
@@ -174,7 +174,7 @@ const Navbar = () => {
                 </svg>
               </button>
               {langDropdownOpen && (
-                <ul className={`absolute mt-2 w-40 bg-white border rounded shadow z-20 ${isAr ? "left-0 text-right" : "right-0 text-left"}`}>
+                <ul className={`absolute mt-2 w-12 bg-white border rounded shadow z-20 ${isAr ? "left-0 text-right" : "right-0 text-left"}`}>
                   {LANGUAGES.map((l) => (
                     <li key={l.code}>
                       <button

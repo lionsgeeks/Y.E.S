@@ -215,8 +215,7 @@ html, body {
 
 
 
-/* Poppins font */
-@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+
 .swiper-button-next,
 .swiper-button-prev {
   color: var(--alpha);
@@ -255,4 +254,13 @@ input[type="checkbox"] {
 .ellipsis-animation::after {
   content: "Loading";
   animation: ellipsis 1.5s infinite steps(1, end);
+}
+
+@font-face {
+  font-family: "yesy" ;
+  src: url("../../public/assets/fonts/MADE\ TOMMY\ Regular_PERSONAL\ USE.otf");
+}
+
+*{
+  font-family: "yesy";
 }
