@@ -63,3 +63,6 @@ require __DIR__ . '/articles.php';
 require __DIR__ . '/messages.php';
 require __DIR__ . '/sponsors.php';
 require __DIR__ . '/scientific-committees.php';
+require __DIR__ . '/ngos.php';
+require __DIR__ . '/maps.php';
+require __DIR__ . '/participants.php';

@@ -1,10 +1,9 @@
-// import { useLocation, useNavigate } from 'react-router-dom';
-
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
 
 const DetailsPage = () => {
-    const { state } = useLocation();
-    const { details, type } = state || {};
+    const { props } = usePage();
+    const details = props.item;
+    const type = props.type;
 
     const renderOrganizationDetails = () => (
         <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md overflow-x-auto">
@@ -664,7 +663,7 @@ const DetailsPage = () => {
     return (
         <div className="min-h-screen bg-gray-50 p-8">
             <Link
-                href={"/map"}
+                href={"/maps"}
                 className="mb-8 p-2  text-beta border border-beta rounded "
             >
                 ← Retour à la carte

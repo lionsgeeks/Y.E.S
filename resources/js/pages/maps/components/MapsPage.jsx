@@ -206,7 +206,7 @@ export default function MapsPage() {
                 const el = document.createElement("div"); el.className = "custom-marker";
                 const img = document.createElement("img");
                 const logoPath = marker.showable.logo || marker.showable.logo_path;
-                img.src = logoPath ? `/storage/images/${logoPath}` : "/default_logo.png";
+                img.src = logoPath ? `/storage/${logoPath}` : "/default_logo.png";
                 img.style.width = "25px"; img.style.height = "25px"; img.style.borderRadius = "50%";
                 img.style.border = "2px solid white"; img.style.objectFit = "cover"; el.appendChild(img);
                 const mapMarker = new mapboxgl.Marker(el).setLngLat([marker.showable?.lng, marker.showable.lat]).addTo(mapRef.current);

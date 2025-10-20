@@ -22,6 +22,87 @@ class MapController extends Controller
         ]);
     }
 
+    public function admin(\Illuminate\Http\Request $request)
+    {
+        $search = trim((string) $request->query('search', ''));
+        $type = strtolower(trim((string) $request->query('type', '')));
+        $query = Show::query()->with('showable')->orderByDesc('id');
+
+        $allTypes = [
+            'organization' => \App\Models\Organization::class,
+            'bailleur' => \App\Models\Bailleur::class,
+            'entreprise' => \App\Models\Entreprise::class,
+            'agence' => \App\Models\Agence::class,
+            'publique' => \App\Models\Publique::class,
+            'academique' => \App\Models\Academique::class,
+        ];
+
+        $morphs = array_values($allTypes);
+        if (isset($allTypes[$type])) {
+            $morphs = [$allTypes[$type]];
+        }
+
+        // Constrain by type then search within
+        $query->whereHasMorph('showable', $morphs, function ($q) use ($search) {
+            if ($search === '') return;
+            $like = '%' . str_replace(['%','_'], ['\\%','\\_'], $search) . '%';
+            $q->where(function ($w) use ($like) {
+                $w->orWhere('name', 'like', $like)
+                  ->orWhere('nom', 'like', $like)
+                  ->orWhere('institution_name', 'like', $like)
+                  ->orWhere('institution_type', 'like', $like)
+                  ->orWhere('secteur', 'like', $like)
+                  ->orWhere('country', 'like', $like);
+            });
+        });
+
+        $shows = $query->paginate(12)->appends(['search' => $search, 'type' => $type]);
+        return inertia('admin/maps/index', [
+            'shows' => $shows,
+            'search' => $search,
+            'type' => $type,
+        ]);
+    }
+
+    public function details(string $type, int $id)
+    {
+        $map = [
+            'organization' => \App\Models\Organization::class,
+            'bailleur' => \App\Models\Bailleur::class,
+            'entreprise' => \App\Models\Entreprise::class,
+            'agence' => \App\Models\Agence::class,
+            'publique' => \App\Models\Publique::class,
+            'academique' => \App\Models\Academique::class,
+        ];
+        abort_unless(isset($map[$type]), 404);
+        $model = $map[$type];
+        $item = $model::findOrFail($id);
+        // Keep type as fully-qualified model name for existing client switch
+        return inertia('maps/details', [
+            'type' => $model,
+            'item' => $item,
+        ]);
+    }
+
+    public function adminDetails(string $type, int $id)
+    {
+        $map = [
+            'organization' => \App\Models\Organization::class,
+            'bailleur' => \App\Models\Bailleur::class,
+            'entreprise' => \App\Models\Entreprise::class,
+            'agence' => \App\Models\Agence::class,
+            'publique' => \App\Models\Publique::class,
+            'academique' => \App\Models\Academique::class,
+        ];
+        abort_unless(isset($map[$type]), 404);
+        $model = $map[$type];
+        $item = $model::findOrFail($id);
+        return inertia('admin/maps/details', [
+            'type' => $type,
+            'item' => $item,
+        ]);
+    }
+
     // Former API: return flat approved markers list (for clients that still call it)
     public function approved()
     {
@@ -101,7 +182,7 @@ class MapController extends Controller
             $saveLogo = function($file) {
                 if (!$file) return null;
                 $name = preg_replace('/[^A-Za-z0-9._-]/', '_', $file->getClientOriginalName());
-                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('images/logos', $file, $name);
+                \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('logos', $file, $name);
                 return 'logos/' . $name;
             };
             $saveFileTo = function($file, string $folder) {
@@ -122,7 +203,7 @@ class MapController extends Controller
             // Additional file field used by some forms (e.g., agences)
             $uploadedStrategicDoc = $request->file('payload.cadre_strategique') ?? $request->file('cadre_strategique') ?? null;
             if ($uploadedStrategicDoc) {
-                $payload['cadre_strategique'] = $saveFileTo($uploadedStrategicDoc, 'documents');
+                $payload['cadre_strategique'] = $saveFileTo($uploadedStrategicDoc, 'uploads');
             }
 
             // If logo fields are strings with absolute paths, collapse to basename under logos/
