@@ -40,10 +40,10 @@ export default function AdminMapsIndex({ shows, search, type }) {
 
     const flat = useMemo(() => {
         const rows = [];
-        (shows?.data || []).forEach(({ showable_type: model, showable }) => {
+        (shows?.data || []).forEach(({ id: showId, approve, showable_type: model, showable }) => {
             if (!showable) return;
             const meta = typeMap[model];
-            rows.push({ model, showable, meta });
+            rows.push({ model, showable, meta, show: { id: showId, approve: !!approve } });
         });
         return rows;
     }, [shows]);
@@ -110,20 +110,21 @@ export default function AdminMapsIndex({ shows, search, type }) {
 }
 
 function Card({ row }) {
-    const { model, showable, meta } = row;
+    const { model, showable, meta, show } = row;
     const badge = meta?.badge ?? '';
     const logo = meta?.logo?.(showable);
     const name = showable?.name || showable?.nom || showable?.institution_name || '';
-    const country = showable?.country || showable?.pays || showable?.pays_origine || '';
+    const email = showable?.contact_email || showable?.nom || showable?.institution_contact_email || '';
 
-    const approve = (showable?.shows?.[0]?.approve) ?? false;
+    const approve = !!(show?.approve);
+    const showId = show?.id;
     const id = showable?.id;
     const detailsType = meta?.key ?? 'organization';
 
     return (
         <div className="card bg-white overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 rounded-xl border border-gray-100">
-            <div className="p-6">
-                <div className="flex items-start mb-4">
+            <div className="p-6 pb-4">
+                <div className="flex items-start mb-6">
                     <div className="w-16 h-16 rounded-lg overflow-hidden mr-4 border border-gray-200 flex-shrink-0 bg-white">
                         {logo ? (
                             <img src={`/storage/${logo}`} alt={name} className="w-full h-full object-contain" />
@@ -132,11 +133,50 @@ function Card({ row }) {
                         )}
                     </div>
                     <div className="min-w-0">
-                        <h3 className="text-lg font-semibold text-gray-900 truncate">{name}</h3>
-                        <p className="text-sm text-gray-500 truncate">{String(country).toString().replace(/[\[\]"]+/g,'')}</p>
-                        <h2 className="bg-[#b09417] text-white px-3 py-0.5 rounded-full font-medium text-xs mt-1 inline-block">{badge}</h2>
+                        <h3 className="text-xl font-semibold text-gray-900 truncate">{name}</h3>
+                        <p className="text-sm text-gray-500 truncate">{email}</p>
+                        <h2 className="bg-[#b09417] text-white px-3 py-0.5 rounded-full font-medium text-xs mt-2 inline-block">{badge}</h2>
                     </div>
-                    <div className="ml-auto">
+                </div>
+                <div className="mt-3 flex items-center justify-between border-t pt-3">
+                    <div className="text-xs text-gray-500"></div>
+                    <div className="flex items-center gap-2">
+                        {showId && !approve && (
+                            <>
+                                <button
+                                    onClick={() => router.post(`/admin/maps/${showId}/approve`, {}, { preserveScroll: true, preserveState: true })}
+                                    className="inline-flex items-center gap-1 rounded-full bg-green-600/90 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500/40"
+                                    type="button"
+                                >
+                                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                    Approve
+                                </button>
+                                <button
+                                    onClick={() => { if (window.confirm('Are you sure you want to deny this marker?')) { router.post(`/admin/maps/${showId}/deny`, {}, { preserveScroll: true, preserveState: true }); } }}
+                                    className="inline-flex items-center gap-1 rounded-full bg-red-600/90 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500/40"
+                                    type="button"
+                                >
+                                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                    Deny
+                                </button>
+                            </>
+                        )}
+                        {showId && approve && (
+                            <>
+                                <span className="inline-flex items-center gap-1 rounded-full bg-green-100 px-2.5 py-1 text-xs font-medium text-green-700">
+                                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                                    Approved
+                                </span>
+                                <button
+                                    onClick={() => { if (window.confirm('Are you sure you want to deny this marker?')) { router.post(`/admin/maps/${showId}/deny`, {}, { preserveScroll: true, preserveState: true }); } }}
+                                    className="inline-flex items-center gap-1 rounded-full bg-red-600/90 px-3 py-1.5 text-xs font-medium text-white shadow-sm hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-500/40"
+                                    type="button"
+                                >
+                                    <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+                                    Deny
+                                </button>
+                            </>
+                        )}
                         <Link href={`/admin/map/details/${detailsType}/${id}`} className="text-blue-600 text-sm hover:underline flex items-center gap-1">
                             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             Détails

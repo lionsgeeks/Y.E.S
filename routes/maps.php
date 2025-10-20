@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/maps', [PagesMapController::class, 'index'])->name('maps');
 Route::get('/admin/maps', [PagesMapController::class, 'admin'])->name('admin.maps');
+Route::post('/admin/maps/{show}/approve', [PagesMapController::class, 'adminApprove'])->name('admin.maps.approve');
+Route::post('/admin/maps/{show}/deny', [PagesMapController::class, 'adminDeny'])->name('admin.maps.deny');
 Route::get('/map/details/{type}/{id}', [PagesMapController::class, 'details'])->name('map.details');
 Route::get('/admin/map/details/{type}/{id}', [PagesMapController::class, 'adminDetails'])->name('admin.map.details');
 Route::post('/maps', [PagesMapController::class, 'store'])->name('maps.store');

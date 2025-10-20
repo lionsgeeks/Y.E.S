@@ -103,6 +103,22 @@ class MapController extends Controller
         ]);
     }
 
+    public function adminApprove(\App\Models\Show $show)
+    {
+        $show->approve = true;
+        $show->pending = false;
+        $show->save();
+        return back();
+    }
+
+    public function adminDeny(\App\Models\Show $show)
+    {
+        $show->approve = false;
+        $show->pending = false;
+        $show->save();
+        return back();
+    }
+
     // Former API: return flat approved markers list (for clients that still call it)
     public function approved()
     {
@@ -304,12 +320,12 @@ class MapController extends Controller
             }
             $entity->save();
 
-            // Create show row using approve flag (no lat/lng columns on shows)
+            // Create show row as pending; backoffice approves before appearing on map
             Show::create([
                 'showable_id' => $entity->getKey(),
                 'showable_type' => $modelClass,
-                'approve' => true,
-                'pending' => false,
+                'approve' => false,
+                'pending' => true,
             ]);
         });
 
