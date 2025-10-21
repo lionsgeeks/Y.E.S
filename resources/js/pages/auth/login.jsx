@@ -6,7 +6,6 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import AuthLayout from '@/layouts/auth-layout';
-import { register } from '@/routes';
 import { request } from '@/routes/password';
 import { Form, Head } from '@inertiajs/react';
 import { LoaderCircle } from 'lucide-react';
@@ -29,8 +28,8 @@ export default function Login({ status, canResetPassword }) {
                 {({ processing, errors }) => (
                     <>
                         <div className="grid gap-6">
-                            <div className="grid gap-2">
-                                <Label htmlFor="email">Email address</Label>
+                            <div className="grid gap-3">
+                                <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email address</Label>
                                 <Input
                                     id="email"
                                     type="email"
@@ -39,18 +38,19 @@ export default function Login({ status, canResetPassword }) {
                                     autoFocus
                                     tabIndex={1}
                                     autoComplete="email"
-                                    placeholder="email@example.com"
+                                    placeholder="Enter your email address"
+                                    className="h-12 px-4 border-gray-200 focus:border-[var(--alpha)] focus:ring-[var(--alpha)]/20 rounded-xl transition-all duration-200"
                                 />
                                 <InputError message={errors.email} />
                             </div>
 
-                            <div className="grid gap-2">
-                                <div className="flex items-center">
-                                    <Label htmlFor="password">Password</Label>
+                            <div className="grid gap-3">
+                                <div className="flex items-center justify-between">
+                                    <Label htmlFor="password" className="text-sm font-medium text-gray-700">Password</Label>
                                     {canResetPassword && (
                                         <TextLink
                                             href={request()}
-                                            className="ml-auto text-sm"
+                                            className="text-sm text-[var(--alpha)] hover:text-[var(--beta)] transition-colors duration-200"
                                             tabIndex={5}
                                         >
                                             Forgot password?
@@ -64,7 +64,8 @@ export default function Login({ status, canResetPassword }) {
                                     required
                                     tabIndex={2}
                                     autoComplete="current-password"
-                                    placeholder="Password"
+                                    placeholder="Enter your password"
+                                    className="h-12 px-4 border-gray-200 focus:border-[var(--alpha)] focus:ring-[var(--alpha)]/20 rounded-xl transition-all duration-200"
                                 />
                                 <InputError message={errors.password} />
                             </div>
@@ -74,28 +75,29 @@ export default function Login({ status, canResetPassword }) {
                                     id="remember"
                                     name="remember"
                                     tabIndex={3}
+                                    className="border-gray-300 data-[state=checked]:bg-[var(--alpha)] data-[state=checked]:border-[var(--alpha)]"
                                 />
-                                <Label htmlFor="remember">Remember me</Label>
+                                <Label htmlFor="remember" className="text-sm text-gray-600">Remember me</Label>
                             </div>
 
                             <Button
                                 type="submit"
-                                className="mt-4 w-full"
+                                className="mt-6 w-full h-12 bg-gradient-to-r from-[var(--alpha)] to-[var(--beta)] hover:from-[var(--alpha)]/90 hover:to-[var(--beta)]/90 text-white font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
                                 tabIndex={4}
                                 disabled={processing}
                                 data-test="login-button"
                             >
                                 {processing && (
-                                    <LoaderCircle className="h-4 w-4 animate-spin" />
+                                    <LoaderCircle className="h-4 w-4 animate-spin mr-2" />
                                 )}
-                                Log in
+                                {processing ? 'Signing in...' : 'Sign In'}
                             </Button>
                         </div>
 
-                        <div className="text-center text-sm text-muted-foreground">
-                            Don't have an account?{' '}
-                            <TextLink href={register()} tabIndex={5}>
-                                Sign up
+                        <div className="text-center text-sm text-gray-500 pt-4 border-t border-gray-100">
+                            Need help accessing your account?{' '}
+                            <TextLink href={request()} className="text-[var(--alpha)] hover:text-[var(--beta)] transition-colors duration-200" tabIndex={5}>
+                                Contact Support
                             </TextLink>
                         </div>
                     </>

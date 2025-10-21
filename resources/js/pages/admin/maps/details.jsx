@@ -6,80 +6,123 @@ export default function AdminMapDetails() {
     const item = props.item || {};
     const type = String(props.type || '').toLowerCase();
 
+    // Helper function to check if a value should be displayed
+    const shouldShow = (value) => {
+        if (value === null || value === undefined || value === '') return false;
+        if (Array.isArray(value) && value.length === 0) return false;
+        if (typeof value === 'string' && value.trim() === '') return false;
+        return true;
+    };
+
+    // Helper function to check if value is an array (or JSON array string)
+    const isArrayValue = (value) => {
+        if (Array.isArray(value)) {
+            return value;
+        }
+        if (typeof value === 'string' && value.startsWith('[') && value.endsWith(']')) {
+            try {
+                const parsed = JSON.parse(value);
+                if (Array.isArray(parsed)) {
+                    return parsed;
+                }
+            } catch (e) {
+                // If parsing fails, return false
+            }
+        }
+        return false;
+    };
+
+    // Helper function to render array as scrollable list
+    const renderArrayAsList = (array) => {
+        return (
+            <div className="max-h-32 overflow-y-auto border border-gray-200 rounded p-2 bg-gray-50">
+                {array.map((item, index) => (
+                    <div key={index} className="py-1 px-2 text-sm border-b border-gray-100 last:border-b-0">
+                        {item}
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
+    // Helper function to render a table row only if value exists
+    const renderRow = (label, value, isLink = false) => {
+        if (!shouldShow(value)) return null;
+        
+        const arrayValue = isArrayValue(value);
+        
+        return (
+            <tr className="border-b border-gray-300">
+                <th className="text-left p-4 bg-[#e0ecff9d] text-black align-top w-1/3">{label}</th>
+                <td className="p-4">
+                    {arrayValue ? (
+                        renderArrayAsList(arrayValue)
+                    ) : isLink ? (
+                        <a href={value} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">
+                            {value}
+                        </a>
+                    ) : (
+                        <span className="whitespace-pre-wrap break-words">{value}</span>
+                    )}
+                </td>
+            </tr>
+        );
+    };
+
     return (
         <AppSidebarLayout breadcrumbs={[{ title: 'Dashboard', href: '/dashboard' }, { title: 'Maps', href: '/admin/maps' }, { title: 'Détails', href: '#' }]}>
             <Head title="Détails" />
             <div className="p-6">
                 {type === 'organization' && (
-                    <Table>
-                        <Row q="Nom de l'organisation" v={item.name} />
-                        <Row q="Année de création" v={item.creation_year} />
-                        <Row q="Statut légal" v={item.legal_status} />
-                        {item.legal_status === 'Autre' && <Row q="Autre statut légal" v={item.other_legal_status} />}
-                        <Row q="Email principal" v={item.main_email} />
-                        <Row q="Téléphone" v={item.phone} />
-                        <Row q="Adresse postale" v={item.postal_address} />
-                        <Row q="Site web" v={<A href={item.website} />} />
-                        <Row q="Pays" v={item.country} />
-                        <Row q="Régions" v={item.regions} />
-                        <Row q="Facebook" v={<A href={item.facebook_url} />} />
-                        <Row q="Twitter" v={<A href={item.twitter_url} />} />
-                        <Row q="LinkedIn" v={<A href={item.linkedin_url} />} />
-                        <Row q="Instagram" v={<A href={item.instagram_url} />} />
-                        <Row q="Nom du contact" v={item.contact_name} />
-                        <Row q="Fonction du contact" v={item.contact_function} />
-                        <Row q="Email du contact" v={item.contact_email} />
-                        <Row q="Zones d'intervention" v={item.intervention_areas} />
-                        <Row q="Groupes cibles" v={item.target_groups} />
-                        <Row q="Bénéficiaires annuels" v={item.annual_beneficiaries} />
-                        <Row q="Titre du programme" v={item.program_title} />
-                        <Row q="Description du programme" v={item.program_description} />
-                        <Row q="Approche méthodologique" v={item.methodological_approach} />
-                        <Row q="Résultats 1" v={item.result1} />
-                        <Row q="Résultats 2" v={item.result2} />
-                        <Row q="Résultats 3" v={item.result3} />
-                        <Row q="Partenaires techniques" v={item.technical_partners} />
-                        <Row q="Partenaires financiers" v={item.financial_partners} />
-                    </Table>
+                    <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
+                        <div className="overflow-x-auto">
+                            <table className="w-full border border-gray-200 table-auto text-sm">
+                                <tbody>
+                                    <tr className="border-b border-gray-300">
+                                        <th className="p-4 bg-alpha text-white w-1/3 border-r">Questions</th>
+                                        <th className="p-4 bg-alpha text-white">Réponse</th>
+                                    </tr>
+                                    {renderRow("Nom de l'organisation", item.name)}
+                                    {renderRow("Année de création", item.creation_year)}
+                                    {renderRow("Statut légal", item.legal_status)}
+                                    {item.legal_status === 'Autre' && renderRow("Autre statut légal", item.other_legal_status)}
+                                    {renderRow("Email principal", item.main_email)}
+                                    {renderRow("Téléphone", item.phone)}
+                                    {renderRow("Adresse postale", item.postal_address)}
+                                    {renderRow("Site web", item.website, true)}
+                                    {renderRow("Pays", item.country)}
+                                    {renderRow("Régions", item.regions)}
+                                    {renderRow("Facebook", item.facebook_url, true)}
+                                    {renderRow("Twitter", item.twitter_url, true)}
+                                    {renderRow("LinkedIn", item.linkedin_url, true)}
+                                    {renderRow("Instagram", item.instagram_url, true)}
+                                    {renderRow("Nom du contact", item.contact_name)}
+                                    {renderRow("Fonction du contact", item.contact_function)}
+                                    {renderRow("Email du contact", item.contact_email)}
+                                    {renderRow("Zones d'intervention", item.intervention_areas)}
+                                    {renderRow("Groupes cibles", item.target_groups)}
+                                    {renderRow("Bénéficiaires annuels", item.annual_beneficiaries)}
+                                    {renderRow("Titre du programme", item.program_title)}
+                                    {renderRow("Description du programme", item.program_description)}
+                                    {renderRow("Approche méthodologique", item.methodological_approach)}
+                                    {renderRow("Résultats 1", item.result1)}
+                                    {renderRow("Résultats 2", item.result2)}
+                                    {renderRow("Résultats 3", item.result3)}
+                                    {renderRow("Partenaires techniques", item.technical_partners)}
+                                    {renderRow("Partenaires financiers", item.financial_partners)}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 )}
                 {type !== 'organization' && (
-                    <pre className="bg-white p-6 rounded-xl border text-sm overflow-auto">{JSON.stringify(item, null, 2)}</pre>
+                    <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
+                        <div className="overflow-x-auto">
+                            <pre className="text-sm overflow-auto">{JSON.stringify(item, null, 2)}</pre>
+                        </div>
+                    </div>
                 )}
             </div>
         </AppSidebarLayout>
     );
 }
-
-function Table({ children }) {
-    return (
-        <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md overflow-x-auto">
-            <table className="min-w-full border border-gray-200 table-auto text-sm">
-                <tbody>
-                    <tr className="border-b border-gray-300">
-                        <th className="p-4 bg-alpha text-white w-1/3 border-r">Questions</th>
-                        <th className="p-4 bg-alpha text-white">Réponse Type</th>
-                    </tr>
-                    {children}
-                </tbody>
-            </table>
-        </div>
-    );
-}
-
-function Row({ q, v }) {
-    return (
-        <tr className="border-b border-gray-300">
-            <th className="text-left p-4 bg-[#e0ecff9d] text-black">{q}</th>
-            <td className="p-4">{v ?? '—'}</td>
-        </tr>
-    );
-}
-
-function A({ href }) {
-    if (!href) return '—';
-    return (
-        <a href={href} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{href}</a>
-    );
-}
-
-

@@ -13,6 +13,36 @@ use Illuminate\Database\Schema\Blueprint;
 
 class MapController extends Controller
 {
+    /**
+     * Filter out null, empty, or meaningless values from an array
+     */
+    private function filterEmptyFields($data)
+    {
+        if (!is_array($data) && !is_object($data)) {
+            return $data;
+        }
+
+        $filtered = [];
+        foreach ($data as $key => $value) {
+            // Skip null, empty string, empty array, or JSON empty array string
+            if ($value === null || $value === '' || $value === '[]' || (is_array($value) && empty($value))) {
+                continue;
+            }
+            
+            // For objects/arrays, recursively filter
+            if (is_array($value) || is_object($value)) {
+                $filteredValue = $this->filterEmptyFields($value);
+                // Only include if the filtered result is not empty
+                if (!empty($filteredValue) && $filteredValue !== []) {
+                    $filtered[$key] = $filteredValue;
+                }
+            } else {
+                $filtered[$key] = $value;
+            }
+        }
+
+        return $filtered;
+    }
 
     public function index()
     {
@@ -240,7 +270,13 @@ class MapController extends Controller
                     if (is_string($value)) {
                         $value = strlen(trim($value)) ? array_map('trim', explode(',', $value)) : [];
                     }
-                    $payload[$k] = json_encode($value);
+                    // Only store if the array is not empty
+                    if (!empty($value) && is_array($value)) {
+                        $payload[$k] = json_encode($value);
+                    } else {
+                        // Remove empty arrays from payload so they don't get stored
+                        unset($payload[$k]);
+                    }
                 }
             };
 

@@ -5,108 +5,116 @@ const DetailsPage = () => {
     const details = props.item;
     const type = props.type;
 
+    // Helper function to check if a value should be displayed
+    const shouldShow = (value) => {
+        if (value === null || value === undefined || value === '') return false;
+        if (Array.isArray(value) && value.length === 0) return false;
+        if (typeof value === 'string' && value.trim() === '') return false;
+        return true;
+    };
+
+    // Helper function to check if value is an array (or JSON array string)
+    const isArrayValue = (value) => {
+        if (Array.isArray(value)) {
+            return value;
+        }
+        if (typeof value === 'string' && value.startsWith('[') && value.endsWith(']')) {
+            try {
+                const parsed = JSON.parse(value);
+                if (Array.isArray(parsed)) {
+                    return parsed;
+                }
+            } catch (e) {
+                // If parsing fails, return false
+            }
+        }
+        return false;
+    };
+
+    // Helper function to render array as scrollable list
+    const renderArrayAsList = (array) => {
+        return (
+            <div className="max-h-32 overflow-y-auto border border-gray-200 rounded p-2 bg-gray-50">
+                {array.map((item, index) => (
+                    <div key={index} className="py-1 px-2 text-sm border-b border-gray-100 last:border-b-0">
+                        {item}
+                    </div>
+                ))}
+            </div>
+        );
+    };
+
+    // Helper function to render a table row only if value exists
+    const renderRow = (label, value, isLink = false, linkProps = {}) => {
+        if (!shouldShow(value)) return null;
+        
+        const arrayValue = isArrayValue(value);
+        
+        return (
+            <tr className="border-b border-gray-300">
+                <th className="text-left p-4 bg-[#e0ecff9d] text-black align-top w-1/3">{label}</th>
+                <td className="p-4">
+                    {arrayValue ? (
+                        renderArrayAsList(arrayValue)
+                    ) : isLink ? (
+                        <a href={value} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer" {...linkProps}>
+                            {value}
+                        </a>
+                    ) : (
+                        <span className="whitespace-pre-wrap break-words">{value}</span>
+                    )}
+                </td>
+            </tr>
+        );
+    };
+
     const renderOrganizationDetails = () => (
-        <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md overflow-x-auto">
-            <table className="min-w-full border border-gray-200 table-auto text-sm">
+        <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
+            <div className="overflow-x-auto">
+                <table className="w-full border border-gray-200 table-auto text-sm">
                 <tbody>
                     <tr className="border-b border-gray-300">
-                        <th className=" p-4 bg-alpha text-white w-1/4 border-r">Qestions</th>
-                        <th className=" p-4 bg-alpha text-white w-1/2">Reponse Type</th>
+                        <th className=" p-4 bg-alpha text-white w-1/4 border-r">Questions</th>
+                        <th className=" p-4 bg-alpha text-white w-1/2">Réponse</th>
                     </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Nom de l'organisation</th>
-                        <td className="p-4">{details.name}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Année de création</th>
-                        <td className="p-4">{details.creation_year}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Statut légal</th>
-                        <td className="p-4">{details.legal_status}</td>
-                    </tr>
-                    {details.legal_status === 'Autre' && (
-                        <tr className="border-b border-gray-300">
-                            <th className="text-left p-4 bg-[#e0ecff9d] text-black">Autre statut légal</th>
-                            <td className="p-4">{details.other_legal_status}</td>
+                    {renderRow("Nom de l'organisation", details.name)}
+                    {renderRow("Année de création", details.creation_year)}
+                    {renderRow("Statut légal", details.legal_status)}
+                    {details.legal_status === 'Autre' && renderRow("Autre statut légal", details.other_legal_status)}
+                    {renderRow("Email principal", details.main_email)}
+                    {renderRow("Téléphone", details.phone)}
+                    {renderRow("Adresse postale", details.postal_address)}
+                    {renderRow("Site web", details.website, true)}
+                    {renderRow("Pays d'implantations", details.country)}
+                    {renderRow("Pays d'interventions", details.regions)}
+                    {shouldShow(details.facebook_url) || shouldShow(details.twitter_url) || shouldShow(details.linkedin_url) || shouldShow(details.instagram_url) ? (
+                        <tr className="border-b border-gray-300 align-top">
+                            <th className="text-left p-4 bg-[#e0ecff9d] text-black">Réseaux sociaux</th>
+                            <td className="p-4">
+                                <ul className="list-disc list-inside space-y-1">
+                                    {shouldShow(details.facebook_url) && (
+                                        <li>Facebook: <a href={details.facebook_url} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.facebook_url}</a></li>
+                                    )}
+                                    {shouldShow(details.twitter_url) && (
+                                        <li>Twitter: <a href={details.twitter_url} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.twitter_url}</a></li>
+                                    )}
+                                    {shouldShow(details.linkedin_url) && (
+                                        <li>LinkedIn: <a href={details.linkedin_url} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.linkedin_url}</a></li>
+                                    )}
+                                    {shouldShow(details.instagram_url) && (
+                                        <li>Instagram: <a href={details.instagram_url} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.instagram_url}</a></li>
+                                    )}
+                                </ul>
+                            </td>
                         </tr>
-                    )}
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Email principal</th>
-                        <td className="p-4">{details.main_email}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Téléphone</th>
-                        <td className="p-4">{details.phone}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Adresse postale</th>
-                        <td className="p-4">{details.postal_address}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Site web</th>
-                        <td className="p-4">
-                            <a href={details.website} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">
-                                {details.website}
-                            </a>
-                        </td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Pays d'implantations</th>
-                        <td className="p-4">{details.country}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Pays d'interventions</th>
-                        <td className="p-4">{details.regions}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300 align-top">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Réseaux sociaux</th>
-                        <td className="p-4">
-                            <ul className="list-disc list-inside space-y-1">
-                                <li>
-                                    Facebook: <a href={details.facebook_url} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.facebook_url}</a>
-                                </li>
-
-                                <li>
-                                    Twitter: <a href={details.twitter_url} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.twitter_url}</a>
-                                </li>
-                                <li>
-                                    LinkedIn: <a href={details.linkedin_url} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.linkedin_url}</a>
-                                </li>
-                                <li>
-                                    Instagram: <a href={details.instagram_url} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.instagram_url}</a>
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Nom du contact</th>
-                        <td className="p-4">{details.contact_name}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Fonction du contact</th>
-                        <td className="p-4">{details.contact_function}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Email du contact</th>
-                        <td className="p-4">{details.contact_email}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Zones d’intervention</th>
-                        <td className="p-4">{details.intervention_areas}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Groupes cibles</th>
-                        <td className="p-4">{details.target_groups}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Bénéficiaires annuels</th>
-                        <td className="p-4">{details.annual_beneficiaries}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Bonnes Pratiques</th>
-                        <td className="p-4">{details.program_title}</td>
-                    </tr>
+                    ) : null}
+                    {renderRow("Nom du contact", details.contact_name)}
+                    {renderRow("Fonction du contact", details.contact_function)}
+                    {renderRow("Email du contact", details.contact_email)}
+                    {renderRow("Zones d'intervention", details.intervention_areas)}
+                    {renderRow("Groupes cibles", details.target_groups)}
+                    {renderRow("Bénéficiaires annuels", details.annual_beneficiaries)}
+                    {renderRow("Bonnes Pratiques", details.program_title)}
                     {/* <tr className="border-b border-gray-300 align-top">
                         <th className="text-left p-4 bg-[#e0ecff9d] text-black">Description du programme</th>
                         <td className="p-4">{details.program_description}</td>
@@ -135,85 +143,57 @@ const DetailsPage = () => {
                         <td className="p-4">{details.financial_partners}</td>
                     </tr> */}
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
     );
 
     const renderBailleurDetails = () => (
-        <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md overflow-x-auto">
-
-            <table className="min-w-full border border-gray-300 table-auto bg-white text-sm rounded-md">
+        <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
+            <div className="overflow-x-auto">
+                <table className="w-full border border-gray-300 table-auto bg-white text-sm rounded-md">
                 <tbody>
                     <tr className="border-b border-gray-300">
-                        <th className=" p-4 bg-alpha text-white w-1/4 border-r">Qestions</th>
-                        <th className=" p-4 bg-alpha text-white w-1/2">Reponse Type</th>
+                        <th className=" p-4 bg-alpha text-white w-1/4 border-r">Questions</th>
+                        <th className=" p-4 bg-alpha text-white w-1/2">Réponse</th>
                     </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Nom d'institution</th>
-                        <td className="p-4">{details.nom}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Type d'institution</th>
-                        <td className="p-4">{details.type_institution}</td>
-                    </tr>
-                    {details.type_institution === 'Autre' && (
+                    {renderRow("Nom d'institution", details.nom)}
+                    {renderRow("Type d'institution", details.type_institution)}
+                    {details.type_institution === 'Autre' && renderRow("Autre", details.type_institution_autre)}
+                    {renderRow("Pays d'origine", details.pays_origine)}
+                    {renderRow("Couverture géographique", details.couverture_geographique)}
+                    {renderRow("Site web", details.site_web, true)}
+                    {renderRow("Email", details.email_contact)}
+                    {renderRow("Téléphone", details.telephone)}
+                    
+                    {(shouldShow(details.contact_responsable?.nom) || shouldShow(details.contact_responsable?.fonction) || shouldShow(details.contact_responsable?.email)) && (
                         <tr className="border-b border-gray-300">
-                            <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Autre</th>
-                            <td className="p-4">{details.type_institution_autre}</td>
+                            <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3 align-top">Contact responsable</th>
+                            <td className="p-4">
+                                {shouldShow(details.contact_responsable?.nom) && <p><strong>Nom:</strong> {details.contact_responsable.nom}</p>}
+                                {shouldShow(details.contact_responsable?.fonction) && <p><strong>Fonction:</strong> {details.contact_responsable.fonction}</p>}
+                                {shouldShow(details.contact_responsable?.email) && <p><strong>Email:</strong> {details.contact_responsable.email}</p>}
+                            </td>
                         </tr>
                     )}
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Pays d’origine</th>
-                        <td className="p-4">{details.pays_origine}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Couverture géographique</th>
-                        <td className="p-4">{details.couverture_geographique}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Site web</th>
-                        <td className="p-4">
-                            <a href={details.site_web} className="text-blue-600" target="_blank" rel="noopener noreferrer">
-                                {details.site_web}
-                            </a>
-                        </td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Email</th>
-                        <td className="p-4">{details.email_contact}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Téléphone</th>
-                        <td className="p-4">{details.telephone}</td>
-                    </tr>
 
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3 align-top">Contact responsable</th>
-                        <td className="p-4">
-                            <p><strong>Nom:</strong> {details.contact_responsable?.nom}</p>
-                            <p><strong>Fonction:</strong> {details.contact_responsable?.fonction}</p>
-                            <p><strong>Email:</strong> {details.contact_responsable?.email}</p>
-                        </td>
-                    </tr>
+                    {(shouldShow(details.twitter_url2) || shouldShow(details.linkedin_url2)) && (
+                        <tr className="border-b border-gray-300">
+                            <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3 align-top">Réseaux sociaux</th>
+                            <td className="p-4">
+                                <ul className="list-disc list-inside space-y-1">
+                                    {shouldShow(details.twitter_url2) && (
+                                        <li>Twitter: <a href={details.twitter_url2} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.twitter_url2}</a></li>
+                                    )}
+                                    {shouldShow(details.linkedin_url2) && (
+                                        <li>LinkedIn: <a href={details.linkedin_url2} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.linkedin_url2}</a></li>
+                                    )}
+                                </ul>
+                            </td>
+                        </tr>
+                    )}
 
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3 align-top">Réseaux sociaux</th>
-                        <td className="p-4">
-                            <ul className="list-disc list-inside space-y-1">
-                                <li>
-                                    Twitter: <a href={details.twitter_url2} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.twitter_url2}</a>
-                                </li>
-                                <li>
-                                    LinkedIn: <a href={details.linkedin_url2} className="text-blue-600 hover:underline" target="_blank" rel="noreferrer">{details.linkedin_url2}</a>
-                                </li>
-                            </ul>
-                        </td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Bonnes Pratiques</th>
-                        <td className="p-4">{details.priorites_thematiques}</td>
-                    </tr>
+                    {renderRow("Bonnes Pratiques", details.priorites_thematiques)}
                     {/* <tr className="border-b border-gray-300">
                         <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Modalités de soutien</th>
                         <td className="p-4">{details.modalites_soutien}</td>
@@ -231,7 +211,7 @@ const DetailsPage = () => {
                         <td className="p-4">{details.budget_annuel}</td>
                     </tr>
                     <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Critères d’éligibilité</th>
+                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Critères d'éligibilité</th>
                         <td className="p-4">{details.criteres_eligibilite}</td>
                     </tr>
                     <tr className="border-b border-gray-300">
@@ -240,7 +220,7 @@ const DetailsPage = () => {
                     </tr>
                     <tr className='border-b
      border-gray-300'>
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Approche d’impact</th>
+                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Approche d'impact</th>
                         <td className="p-4">{details.approche_impact}</td>
                     </tr>
                     <tr className='border-b
@@ -254,135 +234,61 @@ const DetailsPage = () => {
                         <td className="p-4">{details.procedure_soumission}</td>
                     </tr> */}
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
     );
 
     const renderEntrepriseDetails = () => (
-        <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md overflow-x-auto">
-
-            <table className="min-w-full border border-gray-300 rounded-md text-sm">
+        <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
+            <div className="overflow-x-auto">
+                <table className="w-full border border-gray-300 rounded-md text-sm">
                 <tbody>
                     <tr className="border-b border-gray-300">
-                        <th className=" p-4 bg-alpha text-white w-1/4 border-r">Qestions</th>
-                        <th className=" p-4 bg-alpha text-white w-1/2">Reponse Type</th>
+                        <th className=" p-4 bg-alpha text-white w-1/4 border-r">Questions</th>
+                        <th className=" p-4 bg-alpha text-white w-1/2">Réponse</th>
                     </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Nom de l'entreprise</th>
-                        <td className="p-4">{details.nom}</td>
-                    </tr>
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Secteur</th>
-                        <td className="p-4">{details.secteur}</td>
-                    </tr>
+                    {renderRow("Nom de l'entreprise", details.nom)}
+                    {renderRow("Secteur", details.secteur)}
+                    {renderRow("Taille", details.taille)}
+                    {renderRow("Pays du siège", details.pays_siege)}
+                    {renderRow("Pays d'interventions", details.regions_afrique)}
+                    {renderRow("Site web", details.site_web, true)}
+                    {renderRow("Email de contact", details.email_contact)}
+                    {renderRow("Téléphone", details.telephone_code && details.telephone_number ? `${details.telephone_code} ${details.telephone_number}` : details.telephone)}
+                    
+                    {(shouldShow(details.contact_rse?.nom) || shouldShow(details.contact_rse?.fonction) || shouldShow(details.contact_rse?.email)) && (
+                        <tr className="border-b border-gray-300">
+                            <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3 align-top">Contact RSE</th>
+                            <td className="p-4">
+                                {shouldShow(details.contact_rse?.nom) && <p><strong>Nom:</strong> {details.contact_rse.nom}</p>}
+                                {shouldShow(details.contact_rse?.fonction) && <p><strong>Fonction:</strong> {details.contact_rse.fonction}</p>}
+                                {shouldShow(details.contact_rse?.email) && <p><strong>Email:</strong> {details.contact_rse.email}</p>}
+                            </td>
+                        </tr>
+                    )}
 
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Taille</th>
-                        <td className="p-4">{details.taille}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Pays du siège</th>
-                        <td className="p-4">{details.pays_siege}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Pays d'interventions</th>
-                        <td className="p-4">{details.regions_afrique}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Site web</th>
-                        <td className="p-4">
-                            <a href={details.site_web} target="_blank" rel="noopener noreferrer" className="text-blue-600 underline">
-                                {details.site_web}
-                            </a>
-                        </td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Email de contact</th>
-                        <td className="p-4">{details.email_contact}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Téléphone</th>
-                        <td className="p-4">{details.telephone_code} {details.telephone_number}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Nom du contact RSE</th>
-                        <td className="p-4">{details.contact_rse.nom}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Fonction du contact RSE</th>
-                        <td className="p-4">{details.contact_rse.fonction}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Email du contact RSE</th>
-                        <td className="p-4">{details.contact_rse.email}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Politique d'inclusion</th>
-                        <td className="p-4">{details.politique_inclusion}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Programmes d'intégration</th>
-                        <td className="p-4">{details.programmes_integration}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Postes/stages annuels</th>
-                        <td className="p-4">{details.postes_stages_annuels}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Dispositifs de formation</th>
-                        <td className="p-4">{details.dispositifs_formation}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Partenariats avec OSC</th>
-                        <td className="p-4">{details.partenariats_osc}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Initiatives de mécénat</th>
-                        <td className="p-4">{details.initiatives_mecenat}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Compétences pro bono</th>
-                        <td className="p-4">{details.competences_pro_bono}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Profils recherchés</th>
-                        <td className="p-4">{details.profils_recherches}</td>
-                    </tr>
-
-                    <tr className="border-b border-gray-300">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Régions de recrutement</th>
-                        <td className="p-4">{details.regions_recrutement}</td>
-                    </tr>
-
-                    <tr className='border-b border-gray-300'>
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black w-1/3">Processus d'intégration</th>
-                        <td className="p-4">{details.processus_integration}</td>
-                    </tr>
+                    {renderRow("Politique d'inclusion", details.politique_inclusion)}
+                    {renderRow("Programmes d'intégration", details.programmes_integration)}
+                    {renderRow("Postes/stages annuels", details.postes_stages_annuels)}
+                    {renderRow("Dispositifs de formation", details.dispositifs_formation)}
+                    {renderRow("Partenariats avec OSC", details.partenariats_osc)}
+                    {renderRow("Initiatives de mécénat", details.initiatives_mecenat)}
+                    {renderRow("Compétences pro bono", details.competences_pro_bono)}
+                    {renderRow("Profils recherchés", details.profils_recherches)}
+                    {renderRow("Régions de recrutement", details.regions_recrutement)}
+                    {renderRow("Processus d'intégration", details.processus_integration)}
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
     );
 
 
     const renderAgenceDetails = () => (
         <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
-            <table className="w-full border border-gray-300 table-auto text-left text-sm">
+            <div className="overflow-x-auto">
+                <table className="w-full border border-gray-300 table-auto text-left text-sm">
                 <tbody>
                     <tr className="border-b text-center border-gray-300">
                         <th className=" p-4 bg-alpha text-white w-1/4 border-r">Qestions</th>
@@ -415,12 +321,14 @@ const DetailsPage = () => {
                     <tr className='border-b border-alpha'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Email</th><td className="p-4">{details.contact_jeunesse?.email}</td></tr>
 
                     <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Priorités thématiques</th><td className="p-4">{details.priorites_thematiques}</td></tr>
-                    <tr className='border-b border-gray-300'>
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Cadre stratégique</th>
-                        <td className="p-4">
-                            <a href={`https://management.youthempowermentsummit.africa/storage/${details.cadre_strategique}`} className="text-blue-600">Télécharger</a>
-                        </td>
-                    </tr>
+                    {shouldShow(details.cadre_strategique) && (
+                        <tr className='border-b border-gray-300'>
+                            <th className="text-left p-4 bg-[#e0ecff9d] text-black">Cadre stratégique</th>
+                            <td className="p-4">
+                                <a href={`/storage/${details.cadre_strategique}`} className="text-blue-600">Télécharger</a>
+                            </td>
+                        </tr>
+                    )}
                     <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Budget</th><td className="p-4">{details.budget}</td></tr>
                     <tr className='border-b border-alpha'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Période</th><td className="p-4">{details.annee_debut} - {details.annee_fin}</td></tr>
 
@@ -445,196 +353,119 @@ const DetailsPage = () => {
                         </>
                     ))}
 
-                    <tr className='border-b border-gray-300'>
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Outils méthodologiques</th>
-                        <td className="p-4">
-                            <a href={`https://management.youthempowermentsummit.africa/storage/${details.outils_methodologiques}`} className="text-blue-600">Télécharger</a>
-                        </td>
-                    </tr>
+                    {shouldShow(details.outils_methodologiques) && (
+                        <tr className='border-b border-gray-300'>
+                            <th className="text-left p-4 bg-[#e0ecff9d] text-black">Outils méthodologiques</th>
+                            <td className="p-4">
+                                <a href={`/storage/${details.outils_methodologiques}`} className="text-blue-600">Télécharger</a>
+                            </td>
+                        </tr>
+                    )}
                     <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Opportunités de financement</th><td className="p-4">{details.opportunites_financement}</td></tr>
                     <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Type de partenaires recherchés</th><td className="p-4">{details.type_partenaires}</td></tr>
                     <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Domaines d'expertise</th><td className="p-4">{details.domaines_expertise}</td></tr>
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
     );
 
     const renderPubliqueDetails = () => (
         <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
-
-            <table className="w-full border border-gray-300 text-sm table-auto text-left">
+            <div className="overflow-x-auto">
+                <table className="w-full border border-gray-300 text-sm table-auto text-left">
                 <tbody>
                     <tr className="border-b text-center border-gray-300">
-                        <th className=" p-4 bg-alpha text-white w-1/4 border-r">Qestions</th>
-                        <th className=" p-4 bg-alpha text-white w-1/2">Reponse Type</th>
+                        <th className=" p-4 bg-alpha text-white w-1/4 border-r">Questions</th>
+                        <th className=" p-4 bg-alpha text-white w-1/2">Réponse</th>
                     </tr>
-                    <tr className='border-b border-gray-300'>
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Name:</th>
-                        <td className='p-4'>{details.institution_name}</td>
-                    </tr>
+                    {renderRow("Nom", details.institution_name)}
+                    {renderRow("Type d'institution", details.institution_type)}
+                    {renderRow("Pays", details.country)}
+                    {renderRow("Site web", details.website, true)}
+                    {renderRow("Email", details.email)}
+                    {renderRow("Téléphone", details.phone_code && details.phone_number ? `${details.phone_code} ${details.phone_number}` : details.phone)}
+                    {renderRow("Adresse", details.address)}
 
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Type d'institution</th><td className="p-4">{details.institution_type}</td></tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Pays</th><td className="p-4">{details.country}</td></tr>
-                    <tr className='border-b border-gray-300'>
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Site web</th>
-                        <td className="p-4">
-                            <a href={details.website} className="text-blue-600" target="_blank" rel="noopener noreferrer">
-                                {details.website}
-                            </a>
-                        </td>
-                    </tr>
+                    {(shouldShow(details.youth_contact_name) || shouldShow(details.youth_contact_position) || shouldShow(details.youth_contact_email)) && (
+                        <>
+                            <tr className='border-b border-gray-300'><th colSpan="2" className="border-t border-b border-alpha p-2 bg-[#e0ecff9d] text-alpha font-semibold">Contact Jeunesse</th></tr>
+                            {renderRow("Nom", details.youth_contact_name)}
+                            {renderRow("Poste", details.youth_contact_position)}
+                            {renderRow("Email", details.youth_contact_email)}
+                        </>
+                    )}
 
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Email</th><td className="p-4">{details.email}</td></tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Téléphone</th><td className="p-4">{details.phone_code} {details.phone_number}</td></tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Adresse</th><td className="p-4">{details.address}</td></tr>
+                    {renderRow("Cadre politique", details.policy_framework)}
+                    {renderRow("Priorités stratégiques", details.strategic_priorities)}
+                    {renderRow("Budget annuel", details.annual_budget)}
+                    {renderRow("Public cible", details.execution_partners)}
+                    {renderRow("Mécanismes de soutien", details.support_mechanisms)}
+                    {renderRow("Nom du Programme phare", details.flagship_program)}
 
-                    <tr className='border-b border-gray-300'><th colSpan="2" className="border-t border-b border-alpha p-2 bg-[#e0ecff9d] text-alpha font-semibold">Contact Jeunesse</th></tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Nom</th><td className="p-4">{details.youth_contact_name}</td></tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Poste</th><td className="p-4">{details.youth_contact_position}</td></tr>
-                    <tr className='border-b border-alpha'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Email</th><td className="p-4">{details.youth_contact_email}</td></tr>
+                    {(shouldShow(details.expected_result_1) || shouldShow(details.expected_result_2) || shouldShow(details.expected_result_3)) && (
+                        <>
+                            <tr className='border-b border-gray-300'><th colSpan="2" className="border-t border-b border-alpha p-2 bg-[#e0ecff9d] text-alpha font-semibold">Résultats attendus</th></tr>
+                            {renderRow("Résultats 1", details.expected_result_1)}
+                            {renderRow("Résultats 2", details.expected_result_2)}
+                            {renderRow("Résultats 3", details.expected_result_3)}
+                        </>
+                    )}
 
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Cadre politique</th><td className="p-4">{details.policy_framework}</td></tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Priorités stratégiques</th><td className="p-4">{details.strategic_priorities}</td></tr>
-
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Budget annuel</th><td className="p-4">{details.annual_budget}</td></tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Public cible</th><td className="p-4">{details.execution_partners}</td></tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Mécanismes de soutien</th><td className="p-4">{details.support_mechanisms}</td></tr>
-
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Nom du Programme phare</th><td className="p-4">{details.flagship_program}</td></tr>
-
-                    <tr className='border-b border-gray-300'><th colSpan="2" className="border-t border-b border-alpha p-2 bg-[#e0ecff9d] text-alpha font-semibold">Résultats attendus</th></tr>
-
-                    <tr className='border-b border-gray-300'>
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Résultats 1</th><td className="p-4">{details.expected_result_1}</td>
-                    </tr>
-                    <tr className='border-b border-gray-300'>
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Résultats 2</th><td className="p-4">{details.expected_result_2}</td>
-                    </tr>
-                    <tr className='border-b border-alpha'>
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black">Résultats 3</th><td className="p-4">{details.expected_result_2}</td>
-                    </tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Assistance Technique</th><td className="p-4">{details.technical_assistance}</td></tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Bonnes pratiques Recherchées</th><td className="p-4">{details.best_practices}</td></tr>
-                    <tr className='border-b border-gray-300'><th className="text-left p-4 bg-[#e0ecff9d] text-black">Opportunites de cooperation </th><td className="p-4">{details.cooperation_opportunities}</td></tr>
+                    {renderRow("Assistance Technique", details.technical_assistance)}
+                    {renderRow("Bonnes pratiques Recherchées", details.best_practices)}
+                    {renderRow("Opportunites de cooperation", details.cooperation_opportunities)}
 
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
     );
 
 
     const renderAcademiqueDetails = () => (
         <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md space-y-4">
-
-            <table className="table-auto w-full border border-gray-300 text-sm">
+            <div className="overflow-x-auto">
+                <table className="table-auto w-full border border-gray-300 text-sm">
                 <tbody>
                     <tr className="border-b border-gray-300">
-                        <th className=" p-4 bg-alpha text-white w-1/4 border-r">Qestions</th>
-                        <th className=" p-4 bg-alpha text-white w-1/2">Reponse Type</th>
+                        <th className=" p-4 bg-alpha text-white w-1/4 border-r">Questions</th>
+                        <th className=" p-4 bg-alpha text-white w-1/2">Réponse</th>
                     </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Nom d'institution</th>
-                        <td className="p-4">{details.nom}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Type d'institution</th>
-                        <td className="p-4">{details.type_institution}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Pays</th>
-                        <td className="p-4">{details.pays}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Département</th>
-                        <td className="p-4">{details.departement}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Site web</th>
-                        <td className="p-4">
-                            {details.site_web ? (
-                                <a href={details.site_web} className="text-blue-600" target="_blank" rel="noopener noreferrer">
-                                    {details.site_web}
-                                </a>
-                            ) : 'Non renseigné'}
-                        </td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Email</th>
-                        <td className="p-4">{details.email}</td>
-                    </tr>
-                    <tr className="border-b border-alpha">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Téléphone</th>
-                        <td className="p-4">{details.telephone}</td>
-                    </tr>
+                    {renderRow("Nom d'institution", details.nom)}
+                    {renderRow("Type d'institution", details.type_institution)}
+                    {renderRow("Pays", details.pays)}
+                    {renderRow("Département", details.departement)}
+                    {renderRow("Site web", details.site_web, true)}
+                    {renderRow("Email", details.email)}
+                    {renderRow("Téléphone", details.telephone)}
 
-                    <tr className="border-b border-alpha">
-                        <th colSpan="2" className="text-left p-4 bg-[#e0ecff9d] text-black ">Contact Chercheur</th>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Nom</th>
-                        <td className="p-4">{details.contact_nom}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Fonction</th>
-                        <td className="p-4">{details.contact_fonction}</td>
-                    </tr>
-                    <tr className="border-b border-alpha">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Email</th>
-                        <td className="p-4">{details.contact_email}</td>
-                    </tr>
+                    {(shouldShow(details.contact_nom) || shouldShow(details.contact_fonction) || shouldShow(details.contact_email)) && (
+                        <>
+                            <tr className="border-b border-alpha">
+                                <th colSpan="2" className="text-left p-4 bg-[#e0ecff9d] text-black">Contact Chercheur</th>
+                            </tr>
+                            {renderRow("Nom", details.contact_nom)}
+                            {renderRow("Fonction", details.contact_fonction)}
+                            {renderRow("Email", details.contact_email)}
+                        </>
+                    )}
 
-                    <tr className="border-b ">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Axes de recherche</th>
-                        <td className="p-4">{details.axes_recherche}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Méthodologies</th>
-                        <td className="p-4">{details.methodologies}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Zones géographiques</th>
-                        <td className="p-4">{details.zones_geographiques}</td>
-                    </tr>
-
-                    <tr className="border-b ">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Programmes de formation</th>
-                        <td className="p-4">{details.programmes_formation}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Public cible</th>
-                        <td className="p-4">{details.public_cible}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Modalités</th>
-                        <td className="p-4">{details.modalites}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Certifications</th>
-                        <td className="p-4">{details.certifications}</td>
-                    </tr>
-
-                    <tr className="border-b ">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Partenaires de recherche</th>
-                        <td className="p-4">{details.partenaires_recherche}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Expertise</th>
-                        <td className="p-4">{details.expertise}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Conférences</th>
-                        <td className="p-4">{details.conferences}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Ateliers</th>
-                        <td className="p-4">{details.ateliers}</td>
-                    </tr>
-                    <tr className="border-b">
-                        <th className="text-left p-4 bg-[#e0ecff9d] text-black ">Ressources disponibles</th>
-                        <td className="p-4">{details.ressources_disponibles}</td>
-                    </tr>
+                    {renderRow("Axes de recherche", details.axes_recherche)}
+                    {renderRow("Méthodologies", details.methodologies)}
+                    {renderRow("Zones géographiques", details.zones_geographiques)}
+                    {renderRow("Programmes de formation", details.programmes_formation)}
+                    {renderRow("Public cible", details.public_cible)}
+                    {renderRow("Modalités", details.modalites)}
+                    {renderRow("Certifications", details.certifications)}
+                    {renderRow("Partenaires de recherche", details.partenaires_recherche)}
+                    {renderRow("Expertise", details.expertise)}
+                    {renderRow("Conférences", details.conferences)}
+                    {renderRow("Ateliers", details.ateliers)}
+                    {renderRow("Ressources disponibles", details.ressources_disponibles)}
                 </tbody>
-            </table>
+                </table>
+            </div>
         </div>
     );
 
