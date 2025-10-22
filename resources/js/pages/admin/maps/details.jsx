@@ -1,5 +1,6 @@
 import { Head, Link, usePage } from '@inertiajs/react';
 import AppSidebarLayout from '@/layouts/app/app-sidebar-layout';
+import MiniMap from '@/components/MiniMap';
 
 export default function AdminMapDetails() {
     const { props } = usePage();
@@ -73,6 +74,23 @@ export default function AdminMapDetails() {
         <AppSidebarLayout breadcrumbs={[{ title: 'Dashboard', href: '/dashboard' }, { title: 'Maps', href: '/admin/maps' }, { title: 'Détails', href: '#' }]}>
             <Head title="Détails" />
             <div className="p-6">
+                {/* Mini Map Section */}
+                {(item.lat && item.lng) && (
+                    <div className="max-w-7xl mx-auto mb-6">
+                        <div className="bg-white rounded-lg shadow-md p-6">
+                            <h3 className="text-lg font-semibold mb-4 text-gray-800">Localisation</h3>
+                            <MiniMap 
+                                lat={parseFloat(item.lat)} 
+                                lng={parseFloat(item.lng)} 
+                                title={item.name || item.nom || item.institution_name || 'Location'}
+                                height="400px"
+                                width="100%"
+                                zoom={8}
+                            />
+                        </div>
+                    </div>
+                )}
+
                 {type === 'organization' && (
                     <div className="max-w-7xl mx-auto p-6 bg-white rounded-lg shadow-md">
                         <div className="overflow-x-auto">
