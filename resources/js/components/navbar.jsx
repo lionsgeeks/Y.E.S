@@ -51,7 +51,7 @@ const Navbar = () => {
     { label: { en: "Home", ar: "الرئيسية", fr: "Accueil" }, path: "/" },
     { label: { en: "About", ar: "حول", fr: "À propos" }, path: "/about" },
     {
-      label: { en: "Maps", ar: " خرائط", fr: "Carts" },
+      label: { en: "Interactive Directory", ar: "الدليل التفاعلي", fr: "Annuaire Interactive" },
       path: "/maps",
     },
     {

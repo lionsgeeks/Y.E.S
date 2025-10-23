@@ -9,14 +9,6 @@ const Drawer = ({ openDrawer, setOpenDrawer }) => {
       className="bg-black/50 fixed inset-0  flex items-end z-50 overflow-hidden  duration-1000 "
     >
       <div className={`bg-white h-[50vh] lg:h-fit overflow-scroll w-full px-5 pt-3 pb-10 rounded-t-lg   `}>
-        <div className="flex justify-end">
-          <button
-            onClick={() => setOpenDrawer(false)}
-            className="px-3 py-1 rounded hover:bg-gray-100 text-red-500"
-          >
-            x
-          </button>
-        </div>
         <h1 className="font-bold text-xl mb-2">
           <TransText
             ar="تقديم المنصة"
@@ -42,8 +34,8 @@ Grâce à une interface intuitive basée sur une carte interactive de l'Afrique,
         </h1>
         <p>
           <TransText
-            en="1. Map the African Youth Ecosystem Create an updated database of all stakeholders involved in youth socioeconomic inclusion programs across the African continent. 
-2. Facilitate Partnerships and Collaborations Develop a privileged networking space enabling organizations to connect, share experiences, and develop operational synergies. 
+            en="1. Map the African Youth Ecosystem Create an updated database of all stakeholders involved in youth socioeconomic inclusion programs across the African continent.
+2. Facilitate Partnerships and Collaborations Develop a privileged networking space enabling organizations to connect, share experiences, and develop operational synergies.
 3. Optimize Resource Allocation Avoid duplication of efforts by enabling better coordination between existing initiatives and identifying underserved geographical areas.
 4. Promote Innovation and Best Practices Foster the exchange of innovative methodologies, effective tools, and success stories between different ecosystem stakeholders.
 5. Strengthen Collective Impact Amplify the impact of individual interventions through a collaborative and coordinated approach at the continental scale.
@@ -63,6 +55,18 @@ Grâce à une interface intuitive basée sur une carte interactive de l'Afrique,
 6. Démocratiser l'Accès aux Opportunités Centraliser l'information sur les programmes, financements et opportunités disponibles pour les jeunes et les organisations qui les accompagnent."
           />
         </p>
+        <div className="flex justify-end mt-6">
+          <button
+            onClick={() => setOpenDrawer(false)}
+            className="bg-blue-600 hover:bg-blue-700 text-white cursor-pointer px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+          >
+            <TransText
+              ar="الوصول إلى الواجهة"
+              fr="Accéder à l'interface"
+              en="Access Interface"
+            />
+          </button>
+        </div>
       </div>
     </div>
   );
