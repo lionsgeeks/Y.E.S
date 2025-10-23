@@ -8,10 +8,15 @@ export default function MiniMap({
     title = "Location", 
     height = "300px",
     width = "100%",
-    zoom = 10 
+    zoom = 10,
+    editable = false,
+    onLocationUpdate = null,
+    previewLat = null,
+    previewLng = null
 }) {
     const mapRef = useRef(null)
     const containerRef = useRef(null)
+    const markerRef = useRef(null)
 
     useEffect(() => {
         if (!lat || !lng) return
@@ -32,24 +37,84 @@ export default function MiniMap({
         mapRef.current = map
 
         // Add a marker for the location
-        new mapboxgl.Marker({
-            color: '#3B82F6', // Blue color
-            scale: 1.2
+        const marker = new mapboxgl.Marker({
+            color: editable ? '#EF4444' : '#3B82F6', // Red if editable, blue if not
+            scale: 1.2,
+            draggable: editable
         })
         .setLngLat([lng, lat])
         .setPopup(
             new mapboxgl.Popup({ offset: 25 })
-                .setHTML(`<div class="p-2"><strong>${title}</strong><br/>Lat: ${lat.toFixed(6)}<br/>Lng: ${lng.toFixed(6)}</div>`)
+                .setHTML(`<div class="p-2"><strong>${title}</strong><br/>Lat: ${lat.toFixed(6)}<br/>Lng: ${lng.toFixed(6)}${editable ? '<br/><small class="text-gray-500">Click map to preview new location</small>' : ''}</div>`)
         )
         .addTo(map)
 
+        markerRef.current = marker
+
+        // Handle map clicks for location preview (not immediate update)
+        if (editable && onLocationUpdate) {
+            const handleMapClick = (e) => {
+                console.log('Map clicked, updating marker position')
+                const newLat = e.lngLat.lat
+                const newLng = e.lngLat.lng
+                marker.setLngLat([newLng, newLat])
+                onLocationUpdate(newLat, newLng)
+            }
+
+            const handleMarkerDrag = () => {
+                const newLat = marker.getLngLat().lat
+                const newLng = marker.getLngLat().lng
+                onLocationUpdate(newLat, newLng)
+            }
+
+            map.on('click', handleMapClick)
+            marker.on('dragend', handleMarkerDrag)
+
+            // Store cleanup functions
+            mapRef.current._clickHandler = handleMapClick
+            mapRef.current._dragHandler = handleMarkerDrag
+        }
+
         return () => {
             if (mapRef.current) {
+                // Remove event listeners if they exist
+                if (mapRef.current._clickHandler) {
+                    mapRef.current.off('click', mapRef.current._clickHandler)
+                }
+                if (markerRef.current && mapRef.current._dragHandler) {
+                    markerRef.current.off('dragend', mapRef.current._dragHandler)
+                }
                 mapRef.current.remove()
                 mapRef.current = null
             }
         }
-    }, [lat, lng, title, zoom])
+    }, [lat, lng, title, zoom, editable, onLocationUpdate])
+
+    // Separate effect to handle only marker position updates without re-rendering the map
+    useEffect(() => {
+        if (markerRef.current && previewLat !== null && previewLng !== null) {
+            console.log('Updating marker to preview position:', { previewLat, previewLng })
+            markerRef.current.setLngLat([previewLng, previewLat])
+            // Also update the popup content
+            const popup = markerRef.current.getPopup()
+            if (popup) {
+                popup.setHTML(`<div class="p-2"><strong>${title}</strong><br/>Lat: ${previewLat.toFixed(6)}<br/>Lng: ${previewLng.toFixed(6)}${editable ? '<br/><small class="text-gray-500">Click map to preview new location</small>' : ''}</div>`)
+            }
+        }
+    }, [previewLat, previewLng, title, editable])
+
+    // Update marker position when preview coordinates change
+    useEffect(() => {
+        if (markerRef.current && previewLat !== null && previewLng !== null) {
+            console.log('Updating marker to preview position:', { previewLat, previewLng })
+            markerRef.current.setLngLat([previewLng, previewLat])
+            // Also update the popup content
+            const popup = markerRef.current.getPopup()
+            if (popup) {
+                popup.setHTML(`<div class="p-2"><strong>${title}</strong><br/>Lat: ${previewLat.toFixed(6)}<br/>Lng: ${previewLng.toFixed(6)}${editable ? '<br/><small class="text-gray-500">Click map to preview new location</small>' : ''}</div>`)
+            }
+        }
+    }, [previewLat, previewLng, title, editable])
 
     if (!lat || !lng) {
         return (

@@ -149,6 +149,34 @@ class MapController extends Controller
         return back();
     }
 
+    public function updateLocation(Request $request, string $type, int $id)
+    {
+        $request->validate([
+            'lat' => 'required|numeric|between:-90,90',
+            'lng' => 'required|numeric|between:-180,180',
+        ]);
+
+        $map = [
+            'organization' => \App\Models\Organization::class,
+            'bailleur' => \App\Models\Bailleur::class,
+            'entreprise' => \App\Models\Entreprise::class,
+            'agence' => \App\Models\Agence::class,
+            'publique' => \App\Models\Publique::class,
+            'academique' => \App\Models\Academique::class,
+        ];
+
+        abort_unless(isset($map[$type]), 404);
+        $model = $map[$type];
+        $item = $model::findOrFail($id);
+
+        $item->lat = $request->lat;
+        $item->lng = $request->lng;
+        $item->save();
+
+        // Return back to the same page with updated data
+        return back()->with('success', 'Location updated successfully');
+    }
+
     // Former API: return flat approved markers list (for clients that still call it)
     public function approved()
     {

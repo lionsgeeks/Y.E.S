@@ -9,6 +9,7 @@ Route::post('/admin/maps/{show}/approve', [PagesMapController::class, 'adminAppr
 Route::post('/admin/maps/{show}/deny', [PagesMapController::class, 'adminDeny'])->name('admin.maps.deny');
 Route::get('/map/details/{type}/{id}', [PagesMapController::class, 'details'])->name('map.details');
 Route::get('/admin/map/details/{type}/{id}', [PagesMapController::class, 'adminDetails'])->name('admin.map.details');
+Route::post('/admin/map/details/{type}/{id}/update-location', [PagesMapController::class, 'updateLocation'])->name('admin.map.update-location');
 Route::post('/maps', [PagesMapController::class, 'store'])->name('maps.store');
 Route::post('/maps/register', [PagesMapController::class, 'register'])->name('maps.register');
 Route::post('/maps/verify', [PagesMapController::class, 'verify'])->name('maps.verify');
